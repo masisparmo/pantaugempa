@@ -233,6 +233,7 @@
                                 <option value="24h">24 Jam Terakhir</option>
                                 <option value="7d" selected>7 Hari Terakhir</option>
                                 <option value="30d">30 Hari Terakhir</option>
+                                <option value="1y">1 Tahun Terakhir</option>
                                 <option value="custom">📅 Custom Rentang Tanggal</option>
                             </select>
                         </div>
@@ -368,19 +369,38 @@
         
         let isMapProgrammaticMove = false;
         let tectonicLayer = null;          
-        let javaFaultsLayer = null;        // Layer khusus Sesar Aktif Jawa (PuSGeN)
+        let indoFaultsLayer = null;        // Layer Sesar Aktif Utama Indonesia (PuSGeN)
         let isTectonicVisible = false;     
 
-        // Data Custom Sesar Aktif Pulau Jawa (Diambil dari pemetaan PuSGeN)
-        const JAVA_FAULTS_GEOJSON = {
+        // Data Custom Sesar Aktif Mayor Indonesia (Diambil/disederhanakan dari pemetaan PuSGeN)
+        const INDO_FAULTS_GEOJSON = {
             "type": "FeatureCollection",
             "features": [
-                { "type": "Feature", "properties": { "Name": "Sesar Cimandiri", "Risk": "Tinggi" }, "geometry": { "type": "LineString", "coordinates": [[106.54, -7.02], [106.85, -6.92], [107.45, -6.82]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Lembang", "Risk": "Tinggi" }, "geometry": { "type": "LineString", "coordinates": [[107.53, -6.83], [107.61, -6.82], [107.72, -6.82]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Baribis", "Risk": "Tinggi" }, "geometry": { "type": "LineString", "coordinates": [[107.75, -6.65], [108.05, -6.72], [108.23, -6.81]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Opak (Bantul)", "Risk": "Sangat Tinggi" }, "geometry": { "type": "LineString", "coordinates": [[110.32, -8.05], [110.35, -7.92], [110.45, -7.75]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Kendeng", "Risk": "Sedang" }, "geometry": { "type": "LineString", "coordinates": [[110.55, -7.25], [111.0, -7.35], [111.8, -7.42], [112.5, -7.48]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Garsela", "Risk": "Sedang" }, "geometry": { "type": "LineString", "coordinates": [[107.7, -7.35], [107.8, -7.25], [107.9, -7.2]] } }
+                // === SESAR JAWA ===
+                { "type": "Feature", "properties": { "Name": "Sesar Cimandiri", "Risk": "Tinggi", "Region": "Jawa Barat" }, "geometry": { "type": "LineString", "coordinates": [[106.54, -7.02], [106.85, -6.92], [107.45, -6.82]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Lembang", "Risk": "Tinggi", "Region": "Jawa Barat" }, "geometry": { "type": "LineString", "coordinates": [[107.53, -6.83], [107.61, -6.82], [107.72, -6.82]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Baribis", "Risk": "Tinggi", "Region": "Jawa Barat" }, "geometry": { "type": "LineString", "coordinates": [[107.75, -6.65], [108.05, -6.72], [108.23, -6.81]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Opak (Bantul)", "Risk": "Sangat Tinggi", "Region": "DIY Yogyakarta" }, "geometry": { "type": "LineString", "coordinates": [[110.32, -8.05], [110.35, -7.92], [110.45, -7.75]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Kendeng", "Risk": "Sedang", "Region": "Jawa Timur" }, "geometry": { "type": "LineString", "coordinates": [[110.55, -7.25], [111.0, -7.35], [111.8, -7.42], [112.5, -7.48]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Garsela", "Risk": "Sedang", "Region": "Jawa Barat" }, "geometry": { "type": "LineString", "coordinates": [[107.7, -7.35], [107.8, -7.25], [107.9, -7.2]] } },
+                
+                // === SESAR SUMATRA ===
+                { "type": "Feature", "properties": { "Name": "Sesar Besar Sumatra (Semangko)", "Risk": "Sangat Tinggi", "Region": "Sumatra (Sepanjang Pulau)" }, "geometry": { "type": "LineString", "coordinates": [[95.3, 5.5], [96.0, 4.5], [97.5, 3.0], [98.8, 2.0], [100.4, -0.9], [101.5, -2.0], [102.3, -3.2], [104.5, -5.5]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Mentawai", "Risk": "Tinggi", "Region": "Sumatra (Lepas Pantai)" }, "geometry": { "type": "LineString", "coordinates": [[96.5, 2.5], [98.0, 0.5], [99.5, -1.5], [101.0, -3.5]] } },
+
+                // === SESAR SULAWESI ===
+                { "type": "Feature", "properties": { "Name": "Sesar Palu-Koro", "Risk": "Sangat Tinggi", "Region": "Sulawesi Tengah" }, "geometry": { "type": "LineString", "coordinates": [[119.7, 0.5], [119.85, -0.9], [120.1, -1.5], [120.5, -2.5]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Matano", "Risk": "Tinggi", "Region": "Sulawesi" }, "geometry": { "type": "LineString", "coordinates": [[120.5, -2.5], [121.5, -2.6], [122.5, -2.8]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Walanae", "Risk": "Tinggi", "Region": "Sulawesi Selatan" }, "geometry": { "type": "LineString", "coordinates": [[119.8, -4.0], [120.1, -4.5], [120.3, -5.2]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Naik Gorontalo", "Risk": "Tinggi", "Region": "Gorontalo" }, "geometry": { "type": "LineString", "coordinates": [[121.5, 1.2], [122.5, 1.0], [123.5, 0.8]] } },
+
+                // === SESAR BALI & NUSA TENGGARA ===
+                { "type": "Feature", "properties": { "Name": "Sesar Naik Flores (Flores Back-Arc Thrust)", "Risk": "Sangat Tinggi", "Region": "Utara Bali - NTB - NTT" }, "geometry": { "type": "LineString", "coordinates": [[114.5, -7.8], [115.5, -7.9], [116.5, -8.0], [118.5, -8.1], [121.0, -8.2]] } },
+                
+                // === SESAR MALUKU & PAPUA ===
+                { "type": "Feature", "properties": { "Name": "Sesar Sorong", "Risk": "Sangat Tinggi", "Region": "Papua Barat - Maluku" }, "geometry": { "type": "LineString", "coordinates": [[128.5, -1.0], [130.5, -0.5], [131.3, -0.9], [132.5, -1.2], [134.0, -1.5]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Tarera-Aiduna", "Risk": "Tinggi", "Region": "Papua" }, "geometry": { "type": "LineString", "coordinates": [[135.0, -3.5], [136.5, -3.6], [138.0, -3.8]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Yapen", "Risk": "Tinggi", "Region": "Papua Utara" }, "geometry": { "type": "LineString", "coordinates": [[134.5, -1.5], [136.0, -1.7], [137.5, -1.8]] } }
             ]
         };
 
@@ -504,14 +524,14 @@
                     });
                 }
                 
-                // Load Local Java Faults (Custom PuSGeN)
-                if (!javaFaultsLayer) {
-                    javaFaultsLayer = L.geoJSON(JAVA_FAULTS_GEOJSON, {
+                // Load Local Indonesia Faults (Custom PuSGeN)
+                if (!indoFaultsLayer) {
+                    indoFaultsLayer = L.geoJSON(INDO_FAULTS_GEOJSON, {
                         style: function (feature) {
                             return { color: "#eab308", weight: 3.5, opacity: 0.9, dashArray: "6, 4" }; // Kuning untuk sesar daratan
                         },
                         onEachFeature: function (feature, layer) {
-                            layer.bindPopup(`<div class="p-1 text-xs"><div class="font-bold text-amber-500 mb-1">Sesar Aktif Jawa (PuSGeN)</div><div><b>${feature.properties.Name}</b></div><div class="text-slate-500 mt-1">Potensi: ${feature.properties.Risk}</div></div>`);
+                            layer.bindPopup(`<div class="p-1 text-xs"><div class="font-bold text-amber-500 mb-1">Sesar Aktif Daratan (PuSGeN)</div><div><b>${feature.properties.Name}</b></div><div class="text-slate-500 mt-1">Wilayah: ${feature.properties.Region}<br/>Potensi: ${feature.properties.Risk}</div></div>`);
                         }
                     });
                 }
@@ -519,7 +539,7 @@
                 if (map) {
                     tectonicLayer.setStyle({ color: isDarkMode ? "#ef4444" : "#f43f5e" });
                     tectonicLayer.addTo(map);
-                    javaFaultsLayer.addTo(map);
+                    indoFaultsLayer.addTo(map);
                     
                     isTectonicVisible = true;
                     btnText.innerText = "Sembunyikan Lempeng";
@@ -619,13 +639,14 @@
             else if (timeKey === '24h') startTimeStr = new Date(now.getTime() - 24*60*60*1000).toISOString();
             else if (timeKey === '7d') startTimeStr = new Date(now.getTime() - 7*24*60*60*1000).toISOString();
             else if (timeKey === '30d') startTimeStr = new Date(now.getTime() - 30*24*60*60*1000).toISOString();
+            else if (timeKey === '1y') startTimeStr = new Date(now.getTime() - 365*24*60*60*1000).toISOString();
             else if (timeKey === 'custom') {
                 if (document.getElementById('start-date').value) startTimeStr = new Date(document.getElementById('start-date').value).toISOString();
                 if (document.getElementById('end-date').value) endTimeStr = new Date(document.getElementById('end-date').value + 'T23:59:59').toISOString();
             }
 
-            // Naikkan limit agar pencarian area map lebih optimal
-            let url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=300`;
+            // Naikkan limit agar pencarian area map & riwayat 1 tahun lebih optimal
+            let url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=1000`;
             if (startTimeStr) url += `&starttime=${startTimeStr}`;
             if (endTimeStr) url += `&endtime=${endTimeStr}`;
 
