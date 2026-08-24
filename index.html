@@ -78,7 +78,7 @@
             <div class="flex items-center space-x-3 text-xs">
                 <div id="source-indicator" class="inline-flex items-center px-3 py-1 rounded-full font-medium bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
                     <span class="w-2 h-2 mr-2 bg-emerald-500 dark:bg-emerald-400 rounded-full animate-ping"></span>
-                    <span id="active-source-text">USGS Global API</span>
+                    <span id="active-source-text">Data Global USGS</span>
                 </div>
                 
                 <button onclick="toggleTheme()" id="theme-toggle-btn" class="p-2 bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center justify-center" title="Ubah Mode Tampilan">
@@ -206,10 +206,10 @@
                     <div class="space-y-3.5">
                         <!-- Provider Choice -->
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Sumber API</label>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Sumber Data</label>
                             <select id="api-provider" onchange="document.getElementById('search-input').value=''; toggleProviderSettings()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
-                                <option value="USGS" selected>USGS API (Seluruh Dunia)</option>
-                                <option value="BMKG">BMKG API (Khusus Indonesia)</option>
+                                <option value="USGS" selected>Data USGS (Seluruh Dunia)</option>
+                                <option value="BMKG">Data BMKG (Khusus Indonesia)</option>
                             </select>
                         </div>
 
@@ -349,7 +349,7 @@
     </div>
 
     <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-500 dark:text-slate-400 mt-2 transition-colors">
-        <p class="mb-2">Data bersumber dari API <a href="https://earthquake.usgs.gov/" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">USGS</a> & <a href="https://data.bmkg.go.id" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">BMKG</a></p>
+        <p class="mb-2">Bersumber dari Data Terbuka <a href="https://earthquake.usgs.gov/" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">USGS</a> & <a href="https://data.bmkg.go.id" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">BMKG</a></p>
         <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
             &copy; 2026 Hak Cipta oleh <a href="https://page.isparmo.com" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline font-bold">ISPARMO</a>
         </p>
@@ -568,12 +568,12 @@
             if (provider === 'USGS') {
                 regionContainer.classList.remove('hidden');
                 timeContainer.classList.remove('hidden');
-                document.getElementById('active-source-text').innerText = 'USGS Global API';
+                document.getElementById('active-source-text').innerText = 'Data Global USGS';
             } else {
                 regionContainer.classList.add('hidden');
                 timeContainer.classList.add('hidden');
                 document.getElementById('custom-date-container').classList.add('hidden');
-                document.getElementById('active-source-text').innerText = 'BMKG Open Data';
+                document.getElementById('active-source-text').innerText = 'Data Terbuka BMKG';
             }
             fetchEarthquakeData();
         }
