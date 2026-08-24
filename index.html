@@ -113,6 +113,7 @@
                     <p class="text-xs text-slate-600 dark:text-slate-400 flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
                         <span><i class="fa-solid fa-clock text-slate-400 mr-1"></i><span id="banner-full-time">--</span></span>
                         <span><i class="fa-solid fa-arrows-down-to-line text-slate-400 mr-1"></i>Kedalaman: <strong id="banner-depth" class="text-slate-700 dark:text-slate-200">-- km</strong></span>
+                        <span id="banner-mmi-wrapper" class="hidden text-amber-600 dark:text-amber-400 font-medium"><i class="fa-solid fa-house-crack mr-1"></i>MMI: <span id="banner-mmi">--</span></span>
                         <span id="banner-potensi-wrapper" class="hidden text-amber-600 dark:text-amber-400 font-medium"><i class="fa-solid fa-triangle-exclamation mr-1"></i><span id="banner-potensi">--</span></span>
                     </p>
                 </div>
@@ -315,7 +316,7 @@
                                         <i id="sort-icon-depth" class="fa-solid fa-sort text-slate-400 text-[10px]"></i>
                                     </div>
                                 </th>
-                                <th class="p-3">Lokasi / Wilayah</th>
+                                <th class="p-3">Lokasi & MMI</th>
                                 <th class="p-3 text-center">Fokus Peta</th>
                             </tr>
                         </thead>
@@ -371,6 +372,14 @@
         let tectonicLayer = null;          
         let indoFaultsLayer = null;        // Layer Sesar Aktif Utama Indonesia (PuSGeN)
         let isTectonicVisible = false;     
+
+        // Fungsi Helper untuk konversi angka MMI ke Romawi
+        function getMMIRoman(mmi) {
+            if (!mmi) return '-';
+            const val = Math.round(mmi);
+            const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+            return roman[val - 1] || 'XII';
+        }
 
         // Data Custom Sesar Aktif Mayor Indonesia (Diambil/disederhanakan dari pemetaan PuSGeN)
         const INDO_FAULTS_GEOJSON = {
@@ -640,7 +649,7 @@
             else if (timeKey === '24h') startTimeStr = new Date(now.getTime() - 24*60*60*1000).toISOString();
             else if (timeKey === '7d') startTimeStr = new Date(now.getTime() - 7*24*60*60*1000).toISOString();
             else if (timeKey === '30d') startTimeStr = new Date(now.getTime() - 30*24*60*60*1000).toISOString();
-            else if (timeKey === '1y') startTimeStr = new Date(now.getTime() - 365*24*60*60*1000).toISOString();
+            if (timeKey === '1y') startTimeStr = new Date(now.getTime() - 365*24*60*60*1000).toISOString();
             else if (timeKey === 'custom') {
                 if (document.getElementById('start-date').value) startTimeStr = new Date(document.getElementById('start-date').value).toISOString();
                 if (document.getElementById('end-date').value) endTimeStr = new Date(document.getElementById('end-date').value + 'T23:59:59').toISOString();
@@ -673,7 +682,9 @@
                     time: f.properties.time,
                     timeFormatted: new Date(f.properties.time).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }),
                     lat: coords[1], lon: coords[0], depth: coords[2] ? Math.round(coords[2]) : 0,
-                    source: 'USGS'
+                    source: 'USGS',
+                    // Perbaikan: Tarik 'mmi' (ShakeMap) jika ada, jika kosong coba 'cdi' (Did You Feel It)
+                    mmiStr: f.properties.mmi ? getMMIRoman(f.properties.mmi) : (f.properties.cdi ? getMMIRoman(f.properties.cdi) : '-')
                 };
             });
 
@@ -708,11 +719,12 @@
             return {
                 id: 'bmkg-' + g.DateTime,
                 mag: parseFloat(g.Magnitude) || 0,
-                place: g.Wilayah + (g.Dirasakan ? ` (Dirasa: ${g.Dirasakan})` : ''),
+                place: g.Wilayah,
                 time: new Date(g.DateTime || (g.Tanggal + ' ' + g.Jam)).getTime(),
                 timeFormatted: `${g.Tanggal} - ${g.Jam}`,
                 lat: parseFloat(c[0]), lon: parseFloat(c[1]), depth: parseFloat(g.Kedalaman) || 0,
-                source: source, potensi: g.Potensi
+                source: source, potensi: g.Potensi,
+                mmiStr: g.Dirasakan || '-'
             };
         }
 
@@ -825,7 +837,18 @@
                 let color = eq.mag >= 6.0 ? '#ef4444' : (eq.mag >= 4.5 ? '#f59e0b' : '#38bdf8');
                 const marker = L.circleMarker([eq.lat, eq.lon], { radius: Math.max(5, eq.mag * 2.8), fillColor: color, color: '#ffffff', weight: 1.5, opacity: 0.9, fillOpacity: 0.75 });
                 
-                marker.bindPopup(`<div class="p-1 text-xs"><div class="font-bold text-slate-800 text-sm mb-1">${eq.place}</div><div><b>M ${eq.mag.toFixed(1)}</b> | ${eq.depth} km | ${eq.timeFormatted}</div></div>`);
+                let popupContent = `<div class="p-1 text-xs"><div class="font-bold text-slate-800 text-sm mb-1">${eq.place}</div><div><b>M ${eq.mag.toFixed(1)}</b> | ${eq.depth} km | ${eq.timeFormatted}</div>`;
+                
+                // Perbaikan: Selalu tampilkan baris MMI di Popup Marker Peta
+                if (eq.mmiStr !== '-') {
+                    popupContent += `<div class="mt-1.5 text-amber-600 font-semibold border-t border-slate-100 pt-1"><b>MMI:</b> ${eq.mmiStr}</div>`;
+                } else {
+                    popupContent += `<div class="mt-1.5 text-slate-500 border-t border-slate-100 pt-1"><b>MMI:</b> - (Tidak ada laporan)</div>`;
+                }
+                
+                popupContent += `</div>`;
+
+                marker.bindPopup(popupContent);
                 marker.addTo(map);
                 mapMarkers.push(marker);
                 bounds.push([eq.lat, eq.lon]);
@@ -858,7 +881,12 @@
                     <td class="p-3 whitespace-nowrap"><div class="font-medium text-slate-800 dark:text-slate-200">${eq.timeFormatted}</div><span class="text-[10px] text-slate-400">${eq.source}</span></td>
                     <td class="p-3 font-mono ${magColor}">M ${eq.mag.toFixed(1)}</td>
                     <td class="p-3 text-slate-600 dark:text-slate-300">${eq.depth} km</td>
-                    <td class="p-3"><div class="line-clamp-1 font-medium text-slate-800 dark:text-slate-200" title="${eq.place}">${eq.place}</div></td>
+                    <td class="p-3">
+                        <div class="line-clamp-1 font-medium text-slate-800 dark:text-slate-200" title="${eq.place}">${eq.place}</div>
+                        ${eq.mmiStr !== '-' 
+                            ? `<div class="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5 line-clamp-1" title="${eq.mmiStr}"><i class="fa-solid fa-house-crack mr-1"></i>MMI: ${eq.mmiStr}</div>` 
+                            : `<div class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5"><i class="fa-solid fa-house-crack mr-1"></i>MMI: - (Tidak ada laporan)</div>`}
+                    </td>
                     <td class="p-3 text-center">
                         <button onclick="focusMapOnLatLon(${eq.lat}, ${eq.lon})" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 rounded-lg transition" title="Lihat Lokasi">
                             <i class="fa-solid fa-crosshairs"></i>
@@ -906,6 +934,17 @@
             document.getElementById('banner-full-time').innerText = latest.timeFormatted;
             document.getElementById('banner-depth').innerText = `${latest.depth} km`;
             
+            const mmiWrapper = document.getElementById('banner-mmi-wrapper');
+            mmiWrapper.classList.remove('hidden'); // Selalu tampilkan wrapper MMI
+            
+            if (latest.mmiStr && latest.mmiStr !== '-') {
+                mmiWrapper.className = "text-amber-600 dark:text-amber-400 font-medium";
+                document.getElementById('banner-mmi').innerText = latest.mmiStr;
+            } else {
+                mmiWrapper.className = "text-slate-500 dark:text-slate-400 font-medium text-xs";
+                document.getElementById('banner-mmi').innerText = "Tidak ada laporan";
+            }
+            
             const diffMin = Math.floor((Date.now() - latest.time) / 60000);
             document.getElementById('banner-time-ago').innerText = diffMin < 60 ? `${Math.max(1, diffMin)} mnt lalu` : (diffMin < 1440 ? `${Math.floor(diffMin/60)} jam lalu` : `${Math.floor(diffMin/1440)} hr lalu`);
         }
@@ -924,9 +963,9 @@
 
         function exportToCSV() {
             if (currentVisibleData.length === 0) return alert("Tidak ada data untuk diekspor di area layar saat ini.");
-            let csv = "Waktu,Magnitudo,Kedalaman_km,Latitude,Longitude,Lokasi,Sumber\n";
+            let csv = "Waktu,Magnitudo,Kedalaman_km,Latitude,Longitude,Lokasi,MMI_Dirasakan,Sumber\n";
             currentVisibleData.forEach(eq => {
-                csv += `"${eq.timeFormatted}",${eq.mag},${eq.depth},${eq.lat},${eq.lon},"${eq.place.replace(/"/g, '""')}","${eq.source}"\n`;
+                csv += `"${eq.timeFormatted}",${eq.mag},${eq.depth},${eq.lat},${eq.lon},"${eq.place.replace(/"/g, '""')}","${eq.mmiStr.replace(/"/g, '""')}","${eq.source}"\n`;
             });
             const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
             const a = document.createElement('a'); a.href = url; a.download = `earthquake_data_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
