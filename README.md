@@ -64,11 +64,12 @@ Web aplikasi untuk memantau gempa berdasarkan BMKG dan USGS dengan real-time mon
 - **BMKG**: https://data.bmkg.go.id/DataMKG/TEWS/
 
 ## 🚀 Cara Menjalankan
-1. Buka file `index.html` di browser (file statis cukup).
-2. Atau jalankan server lokal di direktori proyek:
+1. Aplikasi sudah di-deploy dan dapat diakses online: https://pantaugempa.isparmo.com
+2. Atau jalankan lokal dari file `index.html` di browser (file statis cukup).
+3. Jika ingin menggunakan server lokal, jalankan dari direktori proyek:
    - Python 3: `python -m http.server 8000`
    - Node (http-server): `npx http-server . -p 8000`
-3. Akses http://localhost:8000 di browser.
+4. Akses http://localhost:8000 (jika menjalankan server lokal) atau buka https://pantaugempa.isparmo.com untuk versi yang dihosting.
 
 ## 🔄 Perubahan Terbaru
 - Memperbarui `index.html` dengan penambahan fitur-fitur berikut:
