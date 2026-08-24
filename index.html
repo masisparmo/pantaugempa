@@ -106,7 +106,7 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2 mb-0.5">
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 uppercase tracking-wider">🔴 Gempa Global Terbaru</span>
+                        <span id="banner-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 uppercase tracking-wider">🔴 Gempa Terbaru</span>
                         <span id="banner-time-ago" class="text-[11px] font-medium text-slate-500 dark:text-slate-400">--</span>
                     </div>
                     <h2 id="banner-title" class="text-sm sm:text-base font-bold text-slate-900 dark:text-white line-clamp-1">Memuat data gempa...</h2>
@@ -439,7 +439,24 @@
             initMap();
             initChart();
             fetchEarthquakeData();
+            
+            // Auto update teks "menit lalu" setiap 1 menit tanpa hit server
+            setInterval(updateTimeAgoTexts, 60000);
+            
+            // Auto Refresh data dari server USGS/BMKG setiap 3 menit
+            setInterval(() => {
+                fetchEarthquakeData(true);
+            }, 3 * 60 * 1000);
         };
+
+        function updateTimeAgoTexts() {
+            if (!rawFetchedEarthquakes.length) return;
+            const latest = [...rawFetchedEarthquakes].sort((a, b) => b.time - a.time)[0];
+            if (latest) {
+                const diffMin = Math.floor((Date.now() - latest.time) / 60000);
+                document.getElementById('banner-time-ago').innerText = diffMin < 60 ? `${Math.max(1, diffMin)} mnt lalu` : (diffMin < 1440 ? `${Math.floor(diffMin/60)} jam lalu` : `${Math.floor(diffMin/1440)} hr lalu`);
+            }
+        }
 
         function initMap() {
             if (!map) {
@@ -623,9 +640,9 @@
             fetchEarthquakeData();
         }
 
-        async function fetchEarthquakeData() {
+        async function fetchEarthquakeData(isSilent = false) {
             const refreshIcon = document.getElementById('refresh-icon');
-            refreshIcon.classList.add('fa-spin');
+            if (!isSilent) refreshIcon.classList.add('fa-spin');
 
             const provider = document.getElementById('api-provider').value;
             try {
@@ -634,7 +651,7 @@
             } catch (err) {
                 console.error(err);
             } finally {
-                refreshIcon.classList.remove('fa-spin');
+                if (!isSilent) refreshIcon.classList.remove('fa-spin');
             }
         }
 
@@ -669,7 +686,8 @@
                 url += `&minlatitude=${b.minlat}&maxlatitude=${b.maxlat}&minlongitude=${b.minlon}&maxlongitude=${b.maxlon}`;
             }
 
-            const response = await fetch(url);
+            // Tambahkan cache: 'no-store' agar Browser tidak menyimpan data usang
+            const response = await fetch(url, { cache: 'no-store' });
             if (!response.ok) return;
             const data = await response.json();
 
@@ -692,9 +710,10 @@
         }
 
         async function fetchBMKGData() {
+            // Tambahkan cache: 'no-store' agar selalu update data terbaru BMKG
             const [res1, res2] = await Promise.all([
-                fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json'),
-                fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json')
+                fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json', { cache: 'no-store' }),
+                fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json', { cache: 'no-store' })
             ]);
             let list = [];
             if (res1.ok) {
@@ -933,6 +952,17 @@
             document.getElementById('banner-title').innerText = latest.place;
             document.getElementById('banner-full-time').innerText = latest.timeFormatted;
             document.getElementById('banner-depth').innerText = `${latest.depth} km`;
+            
+            // Ubah Label Banner secara dinamis menyesuaikan filter agar tidak membingungkan
+            const minMag = parseFloat(document.getElementById('mag-filter').value) || 0;
+            const provider = document.getElementById('api-provider').value;
+            const badge = document.getElementById('banner-badge');
+            
+            if (provider === 'BMKG') {
+                badge.innerText = "🔴 GEMPA BMKG TERBARU";
+            } else {
+                badge.innerText = `🔴 GEMPA TERBARU (M ≥ ${minMag.toFixed(1)})`;
+            }
             
             const mmiWrapper = document.getElementById('banner-mmi-wrapper');
             mmiWrapper.classList.remove('hidden'); // Selalu tampilkan wrapper MMI
