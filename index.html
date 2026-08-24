@@ -182,6 +182,10 @@
                 <!-- Map Wrapper with Floating Button for Bounding Box Query -->
                 <div class="map-container relative">
                     <div id="map"></div>
+                    <!-- Tombol Lempeng Tektonik -->
+                    <button id="tectonic-btn" onclick="toggleTectonicPlates()" class="absolute top-4 right-4 z-[400] bg-white/90 dark:bg-slate-800/90 backdrop-blur hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-3 py-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 font-semibold text-[11px] transition-all flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-lines-leaning text-rose-500"></i> <span id="tectonic-btn-text">Tampilkan Lempeng</span>
+                    </button>
                     <!-- Tombol pintar yang muncul saat Zoom Out / Panning -->
                     <button id="search-area-btn" onclick="fetchDataForCurrentMapBounds()" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 z-[400] bg-indigo-600/95 backdrop-blur hover:bg-indigo-500 text-white px-5 py-2.5 rounded-full shadow-lg shadow-indigo-600/30 font-bold text-xs cursor-pointer border border-indigo-400 transition-all duration-300 items-center gap-2 pointer-events-auto">
                         <i class="fa-solid fa-magnifying-glass-location fa-beat-fade"></i> Cari Gempa di Area Layar Ini
@@ -362,9 +366,24 @@
         let isDarkMode = false;
         let sortConfig = { column: 'time', direction: 'desc' };
         
-        let isMapProgrammaticMove = false; // Mencegah loop ketika map digeser oleh sistem
+        let isMapProgrammaticMove = false;
+        let tectonicLayer = null;          
+        let javaFaultsLayer = null;        // Layer khusus Sesar Aktif Jawa (PuSGeN)
+        let isTectonicVisible = false;     
 
-        // Alias & Area Bounding
+        // Data Custom Sesar Aktif Pulau Jawa (Diambil dari pemetaan PuSGeN)
+        const JAVA_FAULTS_GEOJSON = {
+            "type": "FeatureCollection",
+            "features": [
+                { "type": "Feature", "properties": { "Name": "Sesar Cimandiri", "Risk": "Tinggi" }, "geometry": { "type": "LineString", "coordinates": [[106.54, -7.02], [106.85, -6.92], [107.45, -6.82]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Lembang", "Risk": "Tinggi" }, "geometry": { "type": "LineString", "coordinates": [[107.53, -6.83], [107.61, -6.82], [107.72, -6.82]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Baribis", "Risk": "Tinggi" }, "geometry": { "type": "LineString", "coordinates": [[107.75, -6.65], [108.05, -6.72], [108.23, -6.81]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Opak (Bantul)", "Risk": "Sangat Tinggi" }, "geometry": { "type": "LineString", "coordinates": [[110.32, -8.05], [110.35, -7.92], [110.45, -7.75]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Kendeng", "Risk": "Sedang" }, "geometry": { "type": "LineString", "coordinates": [[110.55, -7.25], [111.0, -7.35], [111.8, -7.42], [112.5, -7.48]] } },
+                { "type": "Feature", "properties": { "Name": "Sesar Garsela", "Risk": "Sedang" }, "geometry": { "type": "LineString", "coordinates": [[107.7, -7.35], [107.8, -7.25], [107.9, -7.2]] } }
+            ]
+        };
+
         const REGION_ALIASES = {
             'ntt': { name: 'Nusa Tenggara Timur', keywords: ['ntt', 'nusa tenggara timur', 'flores', 'sumba', 'kupang', 'ende', 'maumere', 'alor', 'rote', 'timor'], center: [-9.5, 121.5], zoom: 7 },
             'ntb': { name: 'Nusa Tenggara Barat', keywords: ['ntb', 'nusa tenggara barat', 'lombok', 'sumbawa', 'mataram', 'bima'], center: [-8.6, 117.5], zoom: 8 },
@@ -454,6 +473,61 @@
             if (chart) {
                 chart.options.plugins.legend.labels.color = isDarkMode ? '#94a3b8' : '#475569';
                 chart.update();
+            }
+        }
+
+        async function toggleTectonicPlates() {
+            const btnText = document.getElementById('tectonic-btn-text');
+            
+            if (isTectonicVisible) {
+                if (tectonicLayer && map) map.removeLayer(tectonicLayer);
+                if (javaFaultsLayer && map) map.removeLayer(javaFaultsLayer);
+                isTectonicVisible = false;
+                btnText.innerText = "Tampilkan Lempeng & Sesar";
+                return;
+            }
+
+            btnText.innerText = "Memuat...";
+            try {
+                // Load Tectonic Plates (Global)
+                if (!tectonicLayer) {
+                    const response = await fetch('https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json');
+                    const data = await response.json();
+                    
+                    tectonicLayer = L.geoJSON(data, {
+                        style: function (feature) {
+                            return { color: isDarkMode ? "#ef4444" : "#f43f5e", weight: 2, opacity: 0.6, dashArray: "4, 6" };
+                        },
+                        onEachFeature: function (feature, layer) {
+                            layer.bindPopup(`<div class="p-1 text-xs"><div class="font-bold text-rose-600 mb-1">Batas Lempeng Utama</div><div>${feature.properties.Name || 'Patahan (Unnamed)'}</div></div>`);
+                        }
+                    });
+                }
+                
+                // Load Local Java Faults (Custom PuSGeN)
+                if (!javaFaultsLayer) {
+                    javaFaultsLayer = L.geoJSON(JAVA_FAULTS_GEOJSON, {
+                        style: function (feature) {
+                            return { color: "#eab308", weight: 3.5, opacity: 0.9, dashArray: "6, 4" }; // Kuning untuk sesar daratan
+                        },
+                        onEachFeature: function (feature, layer) {
+                            layer.bindPopup(`<div class="p-1 text-xs"><div class="font-bold text-amber-500 mb-1">Sesar Aktif Jawa (PuSGeN)</div><div><b>${feature.properties.Name}</b></div><div class="text-slate-500 mt-1">Potensi: ${feature.properties.Risk}</div></div>`);
+                        }
+                    });
+                }
+                
+                if (map) {
+                    tectonicLayer.setStyle({ color: isDarkMode ? "#ef4444" : "#f43f5e" });
+                    tectonicLayer.addTo(map);
+                    javaFaultsLayer.addTo(map);
+                    
+                    isTectonicVisible = true;
+                    btnText.innerText = "Sembunyikan Lempeng";
+                }
+            } catch (error) {
+                console.error("Gagal memuat data:", error);
+                btnText.innerText = "Gagal Memuat";
+                setTimeout(() => { btnText.innerText = "Tampilkan Lempeng & Sesar"; }, 2000);
             }
         }
 
