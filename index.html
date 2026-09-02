@@ -69,6 +69,10 @@
                     <span id="active-source-text">Data Global USGS</span>
                 </div>
                 
+                <button onclick="App.UI.toggleAboutModal(true)" class="p-2 bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-sky-400 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center justify-center gap-1.5 font-medium px-3" title="Tentang Aplikasi">
+                    <i class="fa-solid fa-circle-info text-sm"></i> <span class="hidden sm:inline">Info</span>
+                </button>
+
                 <button onclick="App.UI.toggleTheme()" id="theme-toggle-btn" class="p-2 bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center justify-center" title="Ubah Mode Tampilan">
                     <i class="fa-solid fa-moon text-sm" id="theme-toggle-icon"></i>
                 </button>
@@ -344,6 +348,100 @@
             &copy; 2026 Hak Cipta oleh <a href="https://page.isparmo.com" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline font-bold">ISPARMO</a>
         </p>
     </footer>
+
+    <!-- ABOUT MODAL -->
+    <div id="about-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-3xl max-h-[90vh] rounded-2xl shadow-2xl flex flex-col transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/80">
+                <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-indigo-600 dark:text-indigo-400"></i> Tentang PANTAU GEMPA
+                </h2>
+                <button onclick="App.UI.toggleAboutModal(false)" class="text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 transition text-lg p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 overflow-y-auto custom-scrollbar space-y-6 text-sm text-slate-600 dark:text-slate-300">
+                
+                <!-- Section: Aplikasi Apa Ini -->
+                <div>
+                    <h3 class="font-bold text-slate-800 dark:text-slate-200 mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">🌍 Apa Itu Pantau Gempa?</h3>
+                    <p class="leading-relaxed">
+                        <strong>PANTAU GEMPA</strong> adalah aplikasi web interaktif untuk memonitor kejadian gempa bumi secara <em>near real-time</em> maupun historis. Aplikasi ini mengintegrasikan data terbuka (Open Data) dari dua lembaga seismologi terkemuka: <strong>BMKG</strong> (fokus Indonesia) dan <strong>USGS</strong> (fokus Global). 
+                        Aplikasi ini dirancang untuk kemudahan analisis visual melalui sinkronisasi pintar antara Peta (GIS), Tabel, dan Grafik Statistik.
+                    </p>
+                </div>
+
+                <!-- Section: Fitur & Teknologi -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-slate-800 dark:text-slate-200 mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">✨ Fitur Utama</h3>
+                        <ul class="list-disc list-inside space-y-1.5 text-slate-600 dark:text-slate-400">
+                            <li>Integrasi multi-sumber (BMKG & USGS).</li>
+                            <li>Sinkronisasi otomatis antara Peta & Tabel data.</li>
+                            <li>Pencarian area otomatis (Auto-Zoom Peta).</li>
+                            <li>Visualisasi batas Lempeng Tektonik & Sesar PuSGeN.</li>
+                            <li>Penyaringan waktu (1 jam s/d 1 tahun terakhir).</li>
+                            <li>Ekspor data terfilter ke format CSV.</li>
+                            <li>Mode Gelap / Terang (Dark/Light Mode).</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 dark:text-slate-200 mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">💻 Teknologi Terpakai</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[11px] font-semibold border border-slate-200 dark:border-slate-700">HTML5 & Vanilla JS</span>
+                            <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[11px] font-semibold border border-slate-200 dark:border-slate-700">Tailwind CSS</span>
+                            <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[11px] font-semibold border border-slate-200 dark:border-slate-700">Leaflet.js (GIS)</span>
+                            <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[11px] font-semibold border border-slate-200 dark:border-slate-700">Chart.js</span>
+                            <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[11px] font-semibold border border-slate-200 dark:border-slate-700">OpenStreetMap & Esri</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Istilah Gempa -->
+                <div>
+                    <h3 class="font-bold text-slate-800 dark:text-slate-200 mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">📖 Glosarium Istilah Gempa</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                            <span class="font-bold text-rose-600 dark:text-rose-400 block mb-1">Magnitudo (M)</span>
+                            Ukuran besaran energi yang dilepaskan oleh sumber gempa. Semakin besar angkanya, semakin besar energi gempanya.
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                            <span class="font-bold text-amber-600 dark:text-amber-400 block mb-1">Kedalaman</span>
+                            Jarak hiposenter (pusat gempa di bawah tanah) dari permukaan. Gempa dangkal (&lt;60 km) umumnya memicu guncangan permukaan yang lebih merusak.
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                            <span class="font-bold text-sky-600 dark:text-sky-400 block mb-1">MMI (Modified Mercalli Intensity)</span>
+                            Skala (Romawi I - XII) untuk mengukur kekuatan <strong>guncangan yang dirasakan</strong> di permukaan dan tingkat kerusakan yang ditimbulkannya.
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                            <span class="font-bold text-indigo-600 dark:text-indigo-400 block mb-1">Sesar / Patahan (Fault)</span>
+                            Rekahan pada kerak bumi tempat terjadinya pergeseran lapisan batuan. Pergeseran mendadak pada sesar aktif memicu gempa bumi.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Developer -->
+                <div class="bg-indigo-50 dark:bg-indigo-950/30 p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/50 flex flex-col md:flex-row items-center justify-between gap-4 mt-2">
+                    <div>
+                        <h4 class="font-bold text-indigo-900 dark:text-indigo-300">Pengembang (Developer)</h4>
+                        <p class="text-xs text-indigo-700 dark:text-indigo-400 font-medium">Dikembangkan oleh ISPARMO.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="https://page.isparmo.com" target="_blank" class="bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center gap-1.5 font-medium text-xs">
+                            <i class="fa-solid fa-globe"></i> page.isparmo.com
+                        </a>
+                        <a href="mailto:mail@isparmo.com" class="bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center gap-1.5 font-medium text-xs">
+                            <i class="fa-solid fa-envelope"></i> mail@isparmo.com
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         /**
@@ -657,6 +755,26 @@
             // MODULE: UI RENDERER
             UI: {
                 chartInstance: null,
+
+                toggleAboutModal(show) {
+                    const modal = document.getElementById('about-modal');
+                    const modalBody = modal.querySelector('div');
+                    
+                    if (show) {
+                        modal.classList.remove('hidden');
+                        // Small timeout to allow display:block to apply before animating opacity
+                        setTimeout(() => {
+                            modal.classList.remove('opacity-0');
+                            modalBody.classList.remove('scale-95');
+                        }, 10);
+                    } else {
+                        modal.classList.add('opacity-0');
+                        modalBody.classList.add('scale-95');
+                        setTimeout(() => {
+                            modal.classList.add('hidden');
+                        }, 300); // Matches the Tailwind duration-300
+                    }
+                },
 
                 initChart() {
                     const ctx = document.getElementById('magnitudeChart').getContext('2d');
