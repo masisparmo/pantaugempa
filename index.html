@@ -5,23 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PANTAU GEMPA</title>
     
+    <!-- Pinned Versions for Security & Stability -->
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/masisparmo/pantaugempa/refs/heads/main/favicon.ico">
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (Pinned Version Config) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class'
         }
     </script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Leaflet.js CSS & JS for Interactive Map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Chart.js for Visualization -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- FontAwesome Icons 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Leaflet.js 1.9.4 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Chart.js 4.4.1 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -39,23 +44,6 @@
         .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
-        
-        .pulse-ring {
-            border-radius: 50%;
-            height: 30px;
-            width: 30px;
-            position: absolute;
-            left: -10px;
-            top: -10px;
-            animation: pulsate 1.8s ease-out infinite;
-            opacity: 0;
-            border: 3px solid #ef4444;
-        }
-        @keyframes pulsate {
-            0% { transform: scale(0.1, 0.1); opacity: 0.0; }
-            50% { opacity: 1.0; }
-            100% { transform: scale(1.2, 1.2); opacity: 0.0; }
-        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white transition-colors duration-200">
@@ -81,11 +69,11 @@
                     <span id="active-source-text">Data Global USGS</span>
                 </div>
                 
-                <button onclick="toggleTheme()" id="theme-toggle-btn" class="p-2 bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center justify-center" title="Ubah Mode Tampilan">
+                <button onclick="App.UI.toggleTheme()" id="theme-toggle-btn" class="p-2 bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center justify-center" title="Ubah Mode Tampilan">
                     <i class="fa-solid fa-moon text-sm" id="theme-toggle-icon"></i>
                 </button>
                 
-                <button onclick="fetchEarthquakeData()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-1.5 rounded-xl transition text-xs font-semibold flex items-center gap-2 shadow-md shadow-indigo-600/20">
+                <button onclick="App.Logic.fetchEarthquakeData()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-1.5 rounded-xl transition text-xs font-semibold flex items-center gap-2 shadow-md shadow-indigo-600/20">
                     <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
                     Muat Ulang
                 </button>
@@ -95,6 +83,7 @@
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6">
 
+        <!-- LATEST QUAKE BANNER -->
         <div id="latest-quake-banner" class="bg-gradient-to-r from-rose-500/10 via-amber-500/10 to-indigo-500/10 dark:from-rose-500/20 dark:via-amber-500/20 dark:to-indigo-500/20 border border-rose-200 dark:border-rose-900/50 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm transition-all duration-300 hidden">
             <div class="flex items-center space-x-3.5">
                 <div class="relative flex items-center justify-center min-w-[3.25rem] h-13 bg-rose-600 text-white font-extrabold text-lg rounded-2xl shadow-lg shadow-rose-600/30 px-3">
@@ -106,23 +95,23 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2 mb-0.5">
-                        <span id="banner-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 uppercase tracking-wider">🔴 Gempa Terbaru</span>
+                        <span id="banner-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 uppercase tracking-wider">🔴 Gempa Terbaru Dataset</span>
                         <span id="banner-time-ago" class="text-[11px] font-medium text-slate-500 dark:text-slate-400">--</span>
                     </div>
                     <h2 id="banner-title" class="text-sm sm:text-base font-bold text-slate-900 dark:text-white line-clamp-1">Memuat data gempa...</h2>
                     <p class="text-xs text-slate-600 dark:text-slate-400 flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
                         <span><i class="fa-solid fa-clock text-slate-400 mr-1"></i><span id="banner-full-time">--</span></span>
                         <span><i class="fa-solid fa-arrows-down-to-line text-slate-400 mr-1"></i>Kedalaman: <strong id="banner-depth" class="text-slate-700 dark:text-slate-200">-- km</strong></span>
-                        <span id="banner-mmi-wrapper" class="hidden text-amber-600 dark:text-amber-400 font-medium"><i class="fa-solid fa-house-crack mr-1"></i>MMI: <span id="banner-mmi">--</span></span>
-                        <span id="banner-potensi-wrapper" class="hidden text-amber-600 dark:text-amber-400 font-medium"><i class="fa-solid fa-triangle-exclamation mr-1"></i><span id="banner-potensi">--</span></span>
+                        <span id="banner-mmi-wrapper" class="hidden text-amber-600 dark:text-amber-400 font-medium"><i class="fa-solid fa-house-crack mr-1"></i><span id="banner-mmi">--</span></span>
                     </p>
                 </div>
             </div>
-            <button onclick="focusMapOnEvent(0)" class="w-full sm:w-auto shrink-0 bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl font-semibold text-xs shadow-md shadow-rose-600/20 transition flex items-center justify-center gap-2">
+            <button onclick="App.Map.focusLatestEvent()" class="w-full sm:w-auto shrink-0 bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl font-semibold text-xs shadow-md shadow-rose-600/20 transition flex items-center justify-center gap-2">
                 <i class="fa-solid fa-crosshairs"></i> Lihat di Peta
             </button>
         </div>
 
+        <!-- STATISTIC CARDS -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center space-x-3 shadow-sm transition-colors">
                 <div class="p-3 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl border border-blue-100 dark:border-blue-500/20 text-xl">
@@ -180,43 +169,45 @@
                     </div>
                 </div>
                 
-                <!-- Map Wrapper with Floating Button for Bounding Box Query -->
+                <!-- Map Wrapper -->
                 <div class="map-container relative">
                     <div id="map"></div>
-                    <!-- Tombol Lempeng Tektonik -->
-                    <button id="tectonic-btn" onclick="toggleTectonicPlates()" class="absolute top-4 right-4 z-[400] bg-white/90 dark:bg-slate-800/90 backdrop-blur hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-3 py-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 font-semibold text-[11px] transition-all flex items-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-lines-leaning text-rose-500"></i> <span id="tectonic-btn-text">Tampilkan Lempeng</span>
+                    <button id="tectonic-btn" onclick="App.Map.toggleTectonicPlates()" class="absolute top-4 right-4 z-[400] bg-white/90 dark:bg-slate-800/90 backdrop-blur hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-3 py-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 font-semibold text-[11px] transition-all flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-lines-leaning text-rose-500"></i> <span id="tectonic-btn-text">Tampilkan Lempeng & Sesar</span>
                     </button>
-                    <!-- Tombol pintar yang muncul saat Zoom Out / Panning -->
-                    <button id="search-area-btn" onclick="fetchDataForCurrentMapBounds()" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 z-[400] bg-indigo-600/95 backdrop-blur hover:bg-indigo-500 text-white px-5 py-2.5 rounded-full shadow-lg shadow-indigo-600/30 font-bold text-xs cursor-pointer border border-indigo-400 transition-all duration-300 items-center gap-2 pointer-events-auto">
+                    <button id="search-area-btn" onclick="App.Logic.fetchDataForCurrentMapBounds()" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 z-[400] bg-indigo-600/95 backdrop-blur hover:bg-indigo-500 text-white px-5 py-2.5 rounded-full shadow-lg shadow-indigo-600/30 font-bold text-xs cursor-pointer border border-indigo-400 transition-all duration-300 items-center gap-2 pointer-events-auto">
                         <i class="fa-solid fa-magnifying-glass-location fa-beat-fade"></i> Cari Gempa di Area Layar Ini
                     </button>
                 </div>
+                <div id="disclaimer-faults" class="hidden mt-2 text-[9px] text-slate-400 text-right italic">
+                    *Garis sesar aktif (kuning) merupakan visualisasi referensi PuSGeN, bukan representasi mutlak / alat prediksi gempa.
+                </div>
             </div>
 
+            <!-- FILTERS AREA -->
             <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm space-y-4 transition-colors">
                 <div>
                     <div class="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-slate-800 pb-3">
                         <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
                             <i class="fa-solid fa-sliders text-indigo-600 dark:text-indigo-400"></i> Filter Pencarian
                         </h3>
-                        <button onclick="resetFilters()" class="text-xs text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 font-medium">Reset</button>
+                        <button onclick="App.Logic.resetFilters()" class="text-xs text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 font-medium">Reset</button>
                     </div>
 
                     <div class="space-y-3.5">
-                        <!-- Provider Choice -->
+                        <!-- Provider -->
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Sumber Data</label>
-                            <select id="api-provider" onchange="document.getElementById('search-input').value=''; toggleProviderSettings()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
+                            <select id="api-provider" onchange="document.getElementById('search-input').value=''; App.UI.toggleProviderSettings()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
                                 <option value="USGS" selected>Data USGS (Seluruh Dunia)</option>
                                 <option value="BMKG">Data BMKG (Khusus Indonesia)</option>
                             </select>
                         </div>
 
-                        <!-- Region Dropdown -->
+                        <!-- Region -->
                         <div id="region-container">
                             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Wilayah Pemfokusan (USGS)</label>
-                            <select id="region-filter" onchange="document.getElementById('search-input').value=''; fetchEarthquakeData()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <select id="region-filter" onchange="document.getElementById('search-input').value=''; App.Logic.fetchEarthquakeData()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="INDONESIA" selected>🇮🇩 Indonesia & Sekitarnya</option>
                                 <option value="GLOBAL">🌐 Seluruh Dunia (Global)</option>
                                 <option value="JAPAN">🇯🇵 Jepang</option>
@@ -226,10 +217,10 @@
                             </select>
                         </div>
 
-                        <!-- Time Horizon -->
+                        <!-- Time -->
                         <div id="time-container">
                             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Rentang Waktu Terakhir</label>
-                            <select id="time-filter" onchange="handleTimeFilterChange()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <select id="time-filter" onchange="App.UI.handleTimeFilterChange()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="1h">1 Jam Terakhir</option>
                                 <option value="24h">24 Jam Terakhir</option>
                                 <option value="7d" selected>7 Hari Terakhir</option>
@@ -242,11 +233,11 @@
                         <div id="custom-date-container" class="hidden grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
                             <div>
                                 <label class="block text-[10px] text-slate-500 mb-1">Mulai Tgl</label>
-                                <input type="date" id="start-date" onchange="fetchEarthquakeData()" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs rounded-lg p-1.5 outline-none text-slate-700 dark:text-slate-200">
+                                <input type="date" id="start-date" onchange="App.Logic.fetchEarthquakeData()" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs rounded-lg p-1.5 outline-none text-slate-700 dark:text-slate-200">
                             </div>
                             <div>
                                 <label class="block text-[10px] text-slate-500 mb-1">Sampai Tgl</label>
-                                <input type="date" id="end-date" onchange="fetchEarthquakeData()" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs rounded-lg p-1.5 outline-none text-slate-700 dark:text-slate-200">
+                                <input type="date" id="end-date" onchange="App.Logic.fetchEarthquakeData()" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs rounded-lg p-1.5 outline-none text-slate-700 dark:text-slate-200">
                             </div>
                         </div>
 
@@ -255,22 +246,21 @@
                             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Saring Nama Wilayah di Tabel</label>
                             <div class="relative">
                                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
-                                <input type="text" id="search-input" onkeyup="applyLocalFilters()" placeholder="Misal: NTT, Jawa Barat, Japan..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-xl pl-8 pr-3 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <input type="text" id="search-input" onkeyup="App.Logic.applyLocalFilters()" placeholder="Misal: NTT, Jawa Barat, Japan..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-xl pl-8 pr-3 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                         </div>
 
-                        <!-- Magnitude Slider -->
+                        <!-- Magnitude -->
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Magnitudo Min</label>
                                 <span id="mag-val" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">0.0</span>
                             </div>
-                            <input type="range" id="mag-filter" min="0" max="8" step="0.5" value="0" oninput="document.getElementById('mag-val').innerText = this.value; applyLocalFilters()" onchange="fetchEarthquakeData()" class="w-full accent-indigo-600 cursor-pointer">
+                            <input type="range" id="mag-filter" min="0" max="8" step="0.5" value="0" oninput="document.getElementById('mag-val').innerText = this.value; App.Logic.applyLocalFilters()" onchange="App.Logic.fetchEarthquakeData()" class="w-full accent-indigo-600 cursor-pointer">
                         </div>
                     </div>
                 </div>
 
-                <!-- Info Box -->
                 <div class="bg-sky-50 dark:bg-sky-950/40 p-3 rounded-xl border border-sky-200 dark:border-sky-800/40 text-[11px] text-sky-800 dark:text-sky-300 leading-relaxed mt-2">
                     <p class="font-semibold flex items-center gap-1.5 mb-1">
                         <i class="fa-solid fa-lightbulb text-amber-500"></i> Tabel Sinkron Peta
@@ -285,10 +275,10 @@
             <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col transition-colors">
                 <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/70 dark:bg-slate-900/60">
                     <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-table-list text-indigo-600 dark:text-indigo-400"></i> Tabel Daftar Gempa (Tampil di Layar Peta)
+                        <i class="fa-solid fa-table-list text-indigo-600 dark:text-indigo-400"></i> Daftar Data Gempa Terfilter
                     </h3>
                     <div class="flex items-center gap-2">
-                        <button onclick="exportToCSV()" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 transition flex items-center gap-1">
+                        <button onclick="App.Data.exportToCSV()" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 transition flex items-center gap-1">
                             <i class="fa-solid fa-download"></i> CSV
                         </button>
                         <span id="result-count-badge" class="text-xs bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 px-2.5 py-1 rounded-full font-mono border border-indigo-200 dark:border-indigo-500/30">0 Data</span>
@@ -298,26 +288,26 @@
                     <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300 relative">
                         <thead class="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 uppercase font-semibold sticky top-0 border-b border-slate-200 dark:border-slate-800 select-none z-20 shadow-sm">
                             <tr>
-                                <th onclick="handleSort('time')" class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition">
+                                <th onclick="App.Logic.handleSort('time')" class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition">
                                     <div class="flex items-center gap-1.5">
                                         <span>Waktu</span>
                                         <i id="sort-icon-time" class="fa-solid fa-arrow-down-wide-short text-indigo-600 dark:text-indigo-400 font-bold text-xs"></i>
                                     </div>
                                 </th>
-                                <th onclick="handleSort('mag')" class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition">
+                                <th onclick="App.Logic.handleSort('mag')" class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition">
                                     <div class="flex items-center gap-1.5">
                                         <span>Mag</span>
                                         <i id="sort-icon-mag" class="fa-solid fa-sort text-slate-400 text-[10px]"></i>
                                     </div>
                                 </th>
-                                <th onclick="handleSort('depth')" class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition">
+                                <th onclick="App.Logic.handleSort('depth')" class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition">
                                     <div class="flex items-center gap-1.5">
                                         <span>Kedalaman</span>
                                         <i id="sort-icon-depth" class="fa-solid fa-sort text-slate-400 text-[10px]"></i>
                                     </div>
                                 </th>
-                                <th class="p-3">Lokasi & MMI</th>
-                                <th class="p-3 text-center">Fokus Peta</th>
+                                <th class="p-3">Lokasi / Wilayah</th>
+                                <th class="p-3 text-center">Fokus</th>
                             </tr>
                         </thead>
                         <tbody id="earthquake-table-body" class="divide-y divide-slate-100 dark:divide-slate-800/60 z-10">
@@ -331,7 +321,7 @@
             <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors">
                 <div class="flex items-center justify-between mb-2">
                     <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-chart-pie text-indigo-600 dark:text-indigo-400"></i> Distribusi Magnitudo (Area Layar)
+                        <i class="fa-solid fa-chart-pie text-indigo-600 dark:text-indigo-400"></i> Distribusi Magnitudo
                     </h3>
                 </div>
                 <div class="relative flex-grow flex items-center justify-center min-h-[250px]">
@@ -356,650 +346,698 @@
     </footer>
 
     <script>
-        // Global States
-        let rawFetchedEarthquakes = [];
-        let filteredEarthquakes = []; // Master list based on API + Text/Mag Filter
-        let currentVisibleData = [];  // List currently visible on screen (Sync Map Bounds)
-        
-        let map = null;
-        let chart = null;
-        let tileLayer = null;
-        let mapMarkers = [];
-        let isDarkMode = false;
-        let sortConfig = { column: 'time', direction: 'desc' };
-        
-        let isMapProgrammaticMove = false;
-        let tectonicLayer = null;          
-        let indoFaultsLayer = null;        // Layer Sesar Aktif Utama Indonesia (PuSGeN)
-        let isTectonicVisible = false;     
+        /**
+         * PANTAU GEMPA - v2.0 Refactored
+         * Architecture Pattern: Namespaced Modules (App.State, App.Data, App.Logic, App.UI, App.Map)
+         * to emulate physical file separation within a single file constraint.
+         */
 
-        // Fungsi Helper untuk konversi angka MMI ke Romawi
-        function getMMIRoman(mmi) {
-            if (!mmi) return '-';
-            const val = Math.round(mmi);
-            const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-            return roman[val - 1] || 'XII';
-        }
+        const App = {
+            // MODULE: STATE MANAGEMENT
+            State: {
+                rawFetchedEarthquakes: [],
+                filteredEarthquakes: [],
+                currentVisibleData: [],
+                isDarkMode: false,
+                sortConfig: { column: 'time', direction: 'desc' }
+            },
 
-        // Data Custom Sesar Aktif Mayor Indonesia (Diambil/disederhanakan dari pemetaan PuSGeN)
-        const INDO_FAULTS_GEOJSON = {
-            "type": "FeatureCollection",
-            "features": [
-                // === SESAR JAWA ===
-                { "type": "Feature", "properties": { "Name": "Sesar Cimandiri", "Risk": "Tinggi", "Region": "Jawa Barat" }, "geometry": { "type": "LineString", "coordinates": [[106.54, -7.02], [106.85, -6.92], [107.45, -6.82]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Lembang", "Risk": "Tinggi", "Region": "Jawa Barat" }, "geometry": { "type": "LineString", "coordinates": [[107.53, -6.83], [107.61, -6.82], [107.72, -6.82]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Baribis", "Risk": "Tinggi", "Region": "Jawa Barat" }, "geometry": { "type": "LineString", "coordinates": [[107.75, -6.65], [108.05, -6.72], [108.23, -6.81]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Opak (Bantul)", "Risk": "Sangat Tinggi", "Region": "DIY Yogyakarta" }, "geometry": { "type": "LineString", "coordinates": [[110.32, -8.05], [110.35, -7.92], [110.45, -7.75]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Kendeng", "Risk": "Sedang", "Region": "Jawa Timur" }, "geometry": { "type": "LineString", "coordinates": [[110.55, -7.25], [111.0, -7.35], [111.8, -7.42], [112.5, -7.48]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Garsela", "Risk": "Sedang", "Region": "Jawa Barat" }, "geometry": { "type": "LineString", "coordinates": [[107.7, -7.35], [107.8, -7.25], [107.9, -7.2]] } },
-                
-                // === SESAR SUMATRA ===
-                { "type": "Feature", "properties": { "Name": "Sesar Besar Sumatra (Semangko)", "Risk": "Sangat Tinggi", "Region": "Sumatra (Sepanjang Pulau)" }, "geometry": { "type": "LineString", "coordinates": [[95.3, 5.5], [96.0, 4.5], [97.5, 3.0], [98.8, 2.0], [100.4, -0.9], [101.5, -2.0], [102.3, -3.2], [104.5, -5.5]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Mentawai", "Risk": "Tinggi", "Region": "Sumatra (Lepas Pantai)" }, "geometry": { "type": "LineString", "coordinates": [[96.5, 2.5], [98.0, 0.5], [99.5, -1.5], [101.0, -3.5]] } },
-
-                // === SESAR SULAWESI ===
-                { "type": "Feature", "properties": { "Name": "Sesar Palu-Koro", "Risk": "Sangat Tinggi", "Region": "Sulawesi Tengah" }, "geometry": { "type": "LineString", "coordinates": [[119.7, 0.5], [119.85, -0.9], [120.1, -1.5], [120.5, -2.5]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Matano", "Risk": "Tinggi", "Region": "Sulawesi" }, "geometry": { "type": "LineString", "coordinates": [[120.5, -2.5], [121.5, -2.6], [122.5, -2.8]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Walanae", "Risk": "Tinggi", "Region": "Sulawesi Selatan" }, "geometry": { "type": "LineString", "coordinates": [[119.8, -4.0], [120.1, -4.5], [120.3, -5.2]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Naik Gorontalo", "Risk": "Tinggi", "Region": "Gorontalo" }, "geometry": { "type": "LineString", "coordinates": [[121.5, 1.2], [122.5, 1.0], [123.5, 0.8]] } },
-
-                // === SESAR BALI & NUSA TENGGARA ===
-                { "type": "Feature", "properties": { "Name": "Sesar Naik Flores (Flores Back-Arc Thrust)", "Risk": "Sangat Tinggi", "Region": "Utara Bali - NTB - NTT" }, "geometry": { "type": "LineString", "coordinates": [[114.5, -7.8], [115.5, -7.9], [116.5, -8.0], [118.5, -8.1], [121.0, -8.2]] } },
-                
-                // === SESAR MALUKU & PAPUA ===
-                { "type": "Feature", "properties": { "Name": "Sesar Sorong", "Risk": "Sangat Tinggi", "Region": "Papua Barat - Maluku" }, "geometry": { "type": "LineString", "coordinates": [[128.5, -1.0], [130.5, -0.5], [131.3, -0.9], [132.5, -1.2], [134.0, -1.5]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Tarera-Aiduna", "Risk": "Tinggi", "Region": "Papua" }, "geometry": { "type": "LineString", "coordinates": [[135.0, -3.5], [136.5, -3.6], [138.0, -3.8]] } },
-                { "type": "Feature", "properties": { "Name": "Sesar Yapen", "Risk": "Tinggi", "Region": "Papua Utara" }, "geometry": { "type": "LineString", "coordinates": [[134.5, -1.5], [136.0, -1.7], [137.5, -1.8]] } }
-            ]
-        };
-
-        const REGION_ALIASES = {
-            'ntt': { name: 'Nusa Tenggara Timur', keywords: ['ntt', 'nusa tenggara timur', 'flores', 'sumba', 'kupang', 'ende', 'maumere', 'alor', 'rote', 'timor'], center: [-9.5, 121.5], zoom: 7 },
-            'ntb': { name: 'Nusa Tenggara Barat', keywords: ['ntb', 'nusa tenggara barat', 'lombok', 'sumbawa', 'mataram', 'bima'], center: [-8.6, 117.5], zoom: 8 },
-            'bali': { name: 'Bali', keywords: ['bali', 'denpasar', 'singaraja', 'kuta', 'ubud'], center: [-8.4, 115.2], zoom: 9 },
-            'jawa timur': { name: 'Jawa Timur', keywords: ['jawa timur', 'jatim', 'malang', 'surabaya', 'banyuwangi', 'pacitan', 'blitar', 'java'], center: [-7.9, 112.6], zoom: 8 },
-            'jawa tengah': { name: 'Jawa Tengah', keywords: ['jawa tengah', 'jateng', 'semarang', 'cilacap', 'jogja', 'yogyakarta', 'solo', 'java'], center: [-7.5, 110.0], zoom: 8 },
-            'jawa barat': { name: 'Jawa Barat', keywords: ['jawa barat', 'jabar', 'bandung', 'sukabumi', 'cianjur', 'garut', 'bogor', 'sunda', 'java'], center: [-6.9, 107.6], zoom: 8 },
-            'sumatra': { name: 'Sumatra', keywords: ['sumatra', 'sumatera', 'aceh', 'medan', 'padang', 'bengkulu', 'lampung', 'nias', 'mentawai'], center: [-0.5, 101.5], zoom: 6 },
-            'sulawesi': { name: 'Sulawesi', keywords: ['sulawesi', 'palu', 'manado', 'makassar', 'gorontalo', 'minahasa', 'celebes'], center: [-2.0, 121.0], zoom: 6 },
-            'maluku': { name: 'Maluku', keywords: ['maluku', 'ambon', 'seram', 'banda', 'ternate', 'halmahera', 'molucca', 'ceram'], center: [-3.2, 128.5], zoom: 7 },
-            'papua': { name: 'Papua', keywords: ['papua', 'jayapura', 'nabire', 'manokwari', 'sorong', 'merauke', 'biak', 'new guinea'], center: [-4.0, 138.0], zoom: 6 }
-        };
-
-        const REGION_BOUNDS = {
-            'INDONESIA': { minlat: -11, maxlat: 6, minlon: 94, maxlon: 141 },
-            'GLOBAL': null,
-            'JAPAN': { minlat: 24, maxlat: 46, minlon: 122, maxlon: 146 },
-            'PHILIPPINES': { minlat: 4, maxlat: 21, minlon: 116, maxlon: 127 },
-            'TURKEY': { minlat: 34, maxlat: 43, minlon: 25, maxlon: 45 },
-            'USA': { minlat: 24.5, maxlat: 49.5, minlon: -125, maxlon: -66.5 }
-        };
-
-        window.onload = function() {
-            initMap();
-            initChart();
-            fetchEarthquakeData();
-            
-            // Auto update teks "menit lalu" setiap 1 menit tanpa hit server
-            setInterval(updateTimeAgoTexts, 60000);
-            
-            // Auto Refresh data dari server USGS/BMKG setiap 3 menit
-            setInterval(() => {
-                fetchEarthquakeData(true);
-            }, 3 * 60 * 1000);
-        };
-
-        function updateTimeAgoTexts() {
-            if (!rawFetchedEarthquakes.length) return;
-            const latest = [...rawFetchedEarthquakes].sort((a, b) => b.time - a.time)[0];
-            if (latest) {
-                const diffMin = Math.floor((Date.now() - latest.time) / 60000);
-                document.getElementById('banner-time-ago').innerText = diffMin < 60 ? `${Math.max(1, diffMin)} mnt lalu` : (diffMin < 1440 ? `${Math.floor(diffMin/60)} jam lalu` : `${Math.floor(diffMin/1440)} hr lalu`);
-            }
-        }
-
-        function initMap() {
-            if (!map) {
-                map = L.map('map').setView([-2.5, 118.0], 5);
-                updateMapTile();
-                
-                // EVENT: Ketika Peta selesai digeser/zoom oleh User
-                map.on('moveend', () => {
-                    if (isMapProgrammaticMove) {
-                        isMapProgrammaticMove = false;
-                        syncTableWithMapBounds(); 
-                        return; // Jangan tampilkan tombol Cari jika digeser otomatis oleh kode
-                    }
-                    
-                    if (document.getElementById('api-provider').value === 'USGS') {
-                        document.getElementById('search-area-btn').classList.remove('hidden');
-                        document.getElementById('search-area-btn').classList.add('flex');
-                    }
-                    
-                    // Filter Tabel berdasarkan area yang sedang dilihat
-                    syncTableWithMapBounds();
-                });
-            }
-        }
-
-        function updateMapTile() {
-            if (!map) return;
-            if (tileLayer) map.removeLayer(tileLayer);
-            const tileUrl = isDarkMode 
-                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-            tileLayer = L.tileLayer(tileUrl, { attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 18 }).addTo(map);
-        }
-
-        function initChart() {
-            const ctx = document.getElementById('magnitudeChart').getContext('2d');
-            chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['M < 4.0', 'M 4.0 - 4.9', 'M 5.0 - 5.9', 'M ≥ 6.0'],
-                    datasets: [{
-                        data: [0, 0, 0, 0],
-                        backgroundColor: ['#38bdf8', '#facc15', '#f97316', '#ef4444'],
-                        borderWidth: 0
-                    }]
+            // MODULE: CONFIG & CONSTANTS
+            Config: {
+                REGION_ALIASES: {
+                    'ntt': { keywords: ['ntt', 'nusa tenggara timur', 'flores', 'sumba', 'kupang', 'ende', 'maumere', 'alor', 'rote', 'timor'], center: [-9.5, 121.5], zoom: 7 },
+                    'ntb': { keywords: ['ntb', 'nusa tenggara barat', 'lombok', 'sumbawa', 'mataram', 'bima'], center: [-8.6, 117.5], zoom: 8 },
+                    'bali': { keywords: ['bali', 'denpasar', 'singaraja', 'kuta', 'ubud'], center: [-8.4, 115.2], zoom: 9 },
+                    'jawa timur': { keywords: ['jawa timur', 'jatim', 'malang', 'surabaya', 'banyuwangi', 'pacitan', 'blitar', 'java'], center: [-7.9, 112.6], zoom: 8 },
+                    'jawa tengah': { keywords: ['jawa tengah', 'jateng', 'semarang', 'cilacap', 'jogja', 'yogyakarta', 'solo', 'java'], center: [-7.5, 110.0], zoom: 8 },
+                    'jawa barat': { keywords: ['jawa barat', 'jabar', 'bandung', 'sukabumi', 'cianjur', 'garut', 'bogor', 'sunda', 'java'], center: [-6.9, 107.6], zoom: 8 },
+                    'sumatra': { keywords: ['sumatra', 'sumatera', 'aceh', 'medan', 'padang', 'bengkulu', 'lampung', 'nias', 'mentawai'], center: [-0.5, 101.5], zoom: 6 },
+                    'sulawesi': { keywords: ['sulawesi', 'palu', 'manado', 'makassar', 'gorontalo', 'minahasa', 'celebes'], center: [-2.0, 121.0], zoom: 6 },
+                    'maluku': { keywords: ['maluku', 'ambon', 'seram', 'banda', 'ternate', 'halmahera', 'molucca', 'ceram'], center: [-3.2, 128.5], zoom: 7 },
+                    'papua': { keywords: ['papua', 'jayapura', 'nabire', 'manokwari', 'sorong', 'merauke', 'biak', 'new guinea'], center: [-4.0, 138.0], zoom: 6 }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: '#475569', font: { size: 11 } } } }
+                REGION_BOUNDS: {
+                    'INDONESIA': { minlat: -11, maxlat: 6, minlon: 94, maxlon: 141 },
+                    'GLOBAL': null,
+                    'JAPAN': { minlat: 24, maxlat: 46, minlon: 122, maxlon: 146 },
+                    'PHILIPPINES': { minlat: 4, maxlat: 21, minlon: 116, maxlon: 127 },
+                    'TURKEY': { minlat: 34, maxlat: 43, minlon: 25, maxlon: 45 },
+                    'USA': { minlat: 24.5, maxlat: 49.5, minlon: -125, maxlon: -66.5 }
+                },
+                // Data disederhanakan dari pemetaan PuSGeN
+                INDO_FAULTS_GEOJSON: {
+                    "type": "FeatureCollection",
+                    "features": [
+                        { "type": "Feature", "properties": { "Name": "Sesar Cimandiri", "Risk": "Sesar Aktif", "Source": "PuSGeN" }, "geometry": { "type": "LineString", "coordinates": [[106.54, -7.02], [106.85, -6.92], [107.45, -6.82]] } },
+                        { "type": "Feature", "properties": { "Name": "Sesar Lembang", "Risk": "Sesar Aktif", "Source": "PuSGeN" }, "geometry": { "type": "LineString", "coordinates": [[107.53, -6.83], [107.61, -6.82], [107.72, -6.82]] } },
+                        { "type": "Feature", "properties": { "Name": "Sesar Baribis", "Risk": "Sesar Aktif", "Source": "PuSGeN" }, "geometry": { "type": "LineString", "coordinates": [[107.75, -6.65], [108.05, -6.72], [108.23, -6.81]] } },
+                        { "type": "Feature", "properties": { "Name": "Sesar Opak", "Risk": "Sesar Aktif", "Source": "PuSGeN" }, "geometry": { "type": "LineString", "coordinates": [[110.32, -8.05], [110.35, -7.92], [110.45, -7.75]] } },
+                        { "type": "Feature", "properties": { "Name": "Sesar Kendeng", "Risk": "Sesar Aktif", "Source": "PuSGeN" }, "geometry": { "type": "LineString", "coordinates": [[110.55, -7.25], [111.0, -7.35], [111.8, -7.42], [112.5, -7.48]] } },
+                        { "type": "Feature", "properties": { "Name": "Sesar Besar Sumatra", "Risk": "Sesar Aktif Utama", "Source": "PuSGeN" }, "geometry": { "type": "LineString", "coordinates": [[95.3, 5.5], [96.0, 4.5], [97.5, 3.0], [98.8, 2.0], [100.4, -0.9], [101.5, -2.0], [102.3, -3.2], [104.5, -5.5]] } },
+                        { "type": "Feature", "properties": { "Name": "Sesar Palu-Koro", "Risk": "Sesar Aktif Utama", "Source": "PuSGeN" }, "geometry": { "type": "LineString", "coordinates": [[119.7, 0.5], [119.85, -0.9], [120.1, -1.5], [120.5, -2.5]] } },
+                        { "type": "Feature", "properties": { "Name": "Sesar Naik Flores", "Risk": "Thrust Fault", "Source": "PuSGeN" }, "geometry": { "type": "LineString", "coordinates": [[114.5, -7.8], [115.5, -7.9], [116.5, -8.0], [118.5, -8.1], [121.0, -8.2]] } },
+                        { "type": "Feature", "properties": { "Name": "Sesar Sorong", "Risk": "Sesar Aktif Utama", "Source": "PuSGeN" }, "geometry": { "type": "LineString", "coordinates": [[128.5, -1.0], [130.5, -0.5], [131.3, -0.9], [132.5, -1.2], [134.0, -1.5]] } }
+                    ]
                 }
-            });
-        }
+            },
 
-        function toggleTheme() {
-            isDarkMode = !isDarkMode;
-            document.documentElement.classList.toggle('dark', isDarkMode);
-            document.getElementById('theme-toggle-icon').className = isDarkMode ? 'fa-solid fa-sun text-amber-400 text-sm' : 'fa-solid fa-moon text-slate-700 text-sm';
-            updateMapTile();
-            if (chart) {
-                chart.options.plugins.legend.labels.color = isDarkMode ? '#94a3b8' : '#475569';
-                chart.update();
-            }
-        }
+            // MODULE: UTILITIES
+            Utils: {
+                // SECURITY: Sanitasi input HTML untuk mencegah XSS
+                escapeHTML(str) {
+                    if (!str) return '';
+                    return String(str).replace(/[&<>'"]/g, tag => ({
+                        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+                    }[tag] || tag));
+                },
+                getMMIRoman(mmi) {
+                    if (!mmi) return null;
+                    const val = Math.round(mmi);
+                    const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+                    return roman[val - 1] || 'XII';
+                },
+                formatTimeAgo(timeMs) {
+                    const diffMin = Math.floor((Date.now() - timeMs) / 60000);
+                    return diffMin < 60 ? `${Math.max(1, diffMin)} mnt lalu` : (diffMin < 1440 ? `${Math.floor(diffMin/60)} jam lalu` : `${Math.floor(diffMin/1440)} hr lalu`);
+                }
+            },
 
-        async function toggleTectonicPlates() {
-            const btnText = document.getElementById('tectonic-btn-text');
-            
-            if (isTectonicVisible) {
-                if (tectonicLayer && map) map.removeLayer(tectonicLayer);
-                if (indoFaultsLayer && map) map.removeLayer(indoFaultsLayer);
-                isTectonicVisible = false;
-                btnText.innerText = "Tampilkan Lempeng & Sesar";
-                return;
-            }
-
-            btnText.innerText = "Memuat...";
-            try {
-                // Load Tectonic Plates (Global)
-                if (!tectonicLayer) {
-                    const response = await fetch('https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json');
-                    const data = await response.json();
+            // MODULE: DATA FETCHING & PARSING
+            Data: {
+                async fetchUSGSData(provider, regionKey, timeKey, minMag, customBounds) {
+                    let startTimeStr = '', endTimeStr = '';
+                    const now = new Date();
                     
-                    tectonicLayer = L.geoJSON(data, {
-                        style: function (feature) {
-                            return { color: isDarkMode ? "#ef4444" : "#f43f5e", weight: 2, opacity: 0.6, dashArray: "4, 6" };
-                        },
-                        onEachFeature: function (feature, layer) {
-                            layer.bindPopup(`<div class="p-1 text-xs"><div class="font-bold text-rose-600 mb-1">Batas Lempeng Utama</div><div>${feature.properties.Name || 'Patahan (Unnamed)'}</div></div>`);
-                        }
-                    });
-                }
-                
-                // Load Local Indonesia Faults (Custom PuSGeN)
-                if (!indoFaultsLayer) {
-                    indoFaultsLayer = L.geoJSON(INDO_FAULTS_GEOJSON, {
-                        style: function (feature) {
-                            return { color: "#eab308", weight: 3.5, opacity: 0.9, dashArray: "6, 4" }; // Kuning untuk sesar daratan
-                        },
-                        onEachFeature: function (feature, layer) {
-                            layer.bindPopup(`<div class="p-1 text-xs"><div class="font-bold text-amber-500 mb-1">Sesar Aktif Daratan (PuSGeN)</div><div><b>${feature.properties.Name}</b></div><div class="text-slate-500 mt-1">Wilayah: ${feature.properties.Region}<br/>Potensi: ${feature.properties.Risk}</div></div>`);
-                        }
-                    });
-                }
-                
-                if (map) {
-                    tectonicLayer.setStyle({ color: isDarkMode ? "#ef4444" : "#f43f5e" });
-                    tectonicLayer.addTo(map);
-                    indoFaultsLayer.addTo(map);
-                    
-                    isTectonicVisible = true;
-                    btnText.innerText = "Sembunyikan Lempeng";
-                }
-            } catch (error) {
-                console.error("Gagal memuat data:", error);
-                btnText.innerText = "Gagal Memuat";
-                setTimeout(() => { btnText.innerText = "Tampilkan Lempeng & Sesar"; }, 2000);
-            }
-        }
-
-        function toggleProviderSettings() {
-            const provider = document.getElementById('api-provider').value;
-            const regionContainer = document.getElementById('region-container');
-            const timeContainer = document.getElementById('time-container');
-            
-            if (provider === 'USGS') {
-                regionContainer.classList.remove('hidden');
-                timeContainer.classList.remove('hidden');
-                document.getElementById('active-source-text').innerText = 'Data Global USGS';
-            } else {
-                regionContainer.classList.add('hidden');
-                timeContainer.classList.add('hidden');
-                document.getElementById('custom-date-container').classList.add('hidden');
-                document.getElementById('active-source-text').innerText = 'Data Terbuka BMKG';
-            }
-            fetchEarthquakeData();
-        }
-
-        function handleTimeFilterChange() {
-            const val = document.getElementById('time-filter').value;
-            const customContainer = document.getElementById('custom-date-container');
-            if (val === 'custom') {
-                customContainer.classList.remove('hidden');
-            } else {
-                customContainer.classList.add('hidden');
-                fetchEarthquakeData();
-            }
-        }
-
-        function resetFilters() {
-            document.getElementById('api-provider').value = 'USGS';
-            document.getElementById('region-filter').value = 'INDONESIA';
-            document.getElementById('time-filter').value = '7d';
-            document.getElementById('mag-filter').value = '0';
-            document.getElementById('mag-val').innerText = '0.0';
-            document.getElementById('search-input').value = '';
-            document.getElementById('custom-date-container').classList.add('hidden');
-            document.getElementById('search-area-btn').classList.add('hidden');
-            
-            toggleProviderSettings();
-        }
-
-        function fetchDataForCurrentMapBounds() {
-            // Sembunyikan tombol
-            document.getElementById('search-area-btn').classList.add('hidden');
-            document.getElementById('search-area-btn').classList.remove('flex');
-            
-            const regionSelect = document.getElementById('region-filter');
-            // Cek apakah opsi Area Peta sudah ada
-            if (![...regionSelect.options].some(o => o.value === 'CUSTOM_MAP')) {
-                const opt = document.createElement('option');
-                opt.value = 'CUSTOM_MAP';
-                opt.text = '📍 Area Peta Saat Ini';
-                regionSelect.add(opt, 0); 
-            }
-            regionSelect.value = 'CUSTOM_MAP';
-            
-            // Bersihkan teks filter agar tidak konflik
-            document.getElementById('search-input').value = '';
-            
-            fetchEarthquakeData();
-        }
-
-        async function fetchEarthquakeData(isSilent = false) {
-            const refreshIcon = document.getElementById('refresh-icon');
-            if (!isSilent) refreshIcon.classList.add('fa-spin');
-
-            const provider = document.getElementById('api-provider').value;
-            try {
-                if (provider === 'USGS') await fetchUSGSData();
-                else await fetchBMKGData();
-            } catch (err) {
-                console.error(err);
-            } finally {
-                if (!isSilent) refreshIcon.classList.remove('fa-spin');
-            }
-        }
-
-        async function fetchUSGSData() {
-            const regionKey = document.getElementById('region-filter').value;
-            const timeKey = document.getElementById('time-filter').value;
-            const minMag = parseFloat(document.getElementById('mag-filter').value) || 0;
-            let startTimeStr = '', endTimeStr = '';
-            const now = new Date();
-            
-            if (timeKey === '1h') startTimeStr = new Date(now.getTime() - 60*60*1000).toISOString();
-            else if (timeKey === '24h') startTimeStr = new Date(now.getTime() - 24*60*60*1000).toISOString();
-            else if (timeKey === '7d') startTimeStr = new Date(now.getTime() - 7*24*60*60*1000).toISOString();
-            else if (timeKey === '30d') startTimeStr = new Date(now.getTime() - 30*24*60*60*1000).toISOString();
-            if (timeKey === '1y') startTimeStr = new Date(now.getTime() - 365*24*60*60*1000).toISOString();
-            else if (timeKey === 'custom') {
-                if (document.getElementById('start-date').value) startTimeStr = new Date(document.getElementById('start-date').value).toISOString();
-                if (document.getElementById('end-date').value) endTimeStr = new Date(document.getElementById('end-date').value + 'T23:59:59').toISOString();
-            }
-
-            // Naikkan limit ke 2000 dan kirim filter magnitudo langsung ke API Server USGS 
-            // agar gempa besar historis tidak terpotong oleh kuota gempa-gempa kecil terbaru
-            let url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=2000&minmagnitude=${minMag}`;
-            if (startTimeStr) url += `&starttime=${startTimeStr}`;
-            if (endTimeStr) url += `&endtime=${endTimeStr}`;
-
-            if (regionKey === 'CUSTOM_MAP' && map) {
-                const bounds = map.getBounds();
-                url += `&minlatitude=${bounds.getSouth()}&maxlatitude=${bounds.getNorth()}&minlongitude=${bounds.getWest()}&maxlongitude=${bounds.getEast()}`;
-            } else if (REGION_BOUNDS[regionKey]) {
-                const b = REGION_BOUNDS[regionKey];
-                url += `&minlatitude=${b.minlat}&maxlatitude=${b.maxlat}&minlongitude=${b.minlon}&maxlongitude=${b.maxlon}`;
-            }
-
-            // Tambahkan cache: 'no-store' agar Browser tidak menyimpan data usang
-            const response = await fetch(url, { cache: 'no-store' });
-            if (!response.ok) return;
-            const data = await response.json();
-
-            rawFetchedEarthquakes = data.features.map(f => {
-                const coords = f.geometry.coordinates;
-                return {
-                    id: f.id,
-                    mag: f.properties.mag || 0,
-                    place: f.properties.place || 'Unknown',
-                    time: f.properties.time,
-                    timeFormatted: new Date(f.properties.time).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }),
-                    lat: coords[1], lon: coords[0], depth: coords[2] ? Math.round(coords[2]) : 0,
-                    source: 'USGS',
-                    // Perbaikan: Tarik 'mmi' (ShakeMap) jika ada, jika kosong coba 'cdi' (Did You Feel It)
-                    mmiStr: f.properties.mmi ? getMMIRoman(f.properties.mmi) : (f.properties.cdi ? getMMIRoman(f.properties.cdi) : '-')
-                };
-            });
-
-            applyLocalFilters();
-        }
-
-        async function fetchBMKGData() {
-            // Tambahkan cache: 'no-store' agar selalu update data terbaru BMKG
-            const [res1, res2] = await Promise.all([
-                fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json', { cache: 'no-store' }),
-                fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json', { cache: 'no-store' })
-            ]);
-            let list = [];
-            if (res1.ok) {
-                const d = await res1.json();
-                (d.Infogempa?.gempa || []).forEach(g => list.push(parseBMKG(g, 'BMKG M≥5')));
-            }
-            if (res2.ok) {
-                const d = await res2.json();
-                (d.Infogempa?.gempa || []).forEach(g => list.push(parseBMKG(g, 'BMKG Dirasakan')));
-            }
-            const unique = [];
-            const seen = new Set();
-            list.sort((a, b) => b.time - a.time).forEach(eq => {
-                if (!seen.has(eq.time)) { seen.add(eq.time); unique.push(eq); }
-            });
-            rawFetchedEarthquakes = unique;
-            applyLocalFilters();
-        }
-
-        function parseBMKG(g, source) {
-            const c = g.Coordinates ? g.Coordinates.split(',') : [0,0];
-            return {
-                id: 'bmkg-' + g.DateTime,
-                mag: parseFloat(g.Magnitude) || 0,
-                place: g.Wilayah,
-                time: new Date(g.DateTime || (g.Tanggal + ' ' + g.Jam)).getTime(),
-                timeFormatted: `${g.Tanggal} - ${g.Jam}`,
-                lat: parseFloat(c[0]), lon: parseFloat(c[1]), depth: parseFloat(g.Kedalaman) || 0,
-                source: source, potensi: g.Potensi,
-                mmiStr: g.Dirasakan || '-'
-            };
-        }
-
-        function applyLocalFilters() {
-            const minMag = parseFloat(document.getElementById('mag-filter').value) || 0;
-            const searchInputVal = document.getElementById('search-input').value.toLowerCase().trim();
-
-            let matchedKeywords = [searchInputVal];
-            let matchedRegionConfig = null;
-
-            if (searchInputVal) {
-                for (const key in REGION_ALIASES) {
-                    if (REGION_ALIASES[key].keywords.some(kw => searchInputVal.includes(kw))) {
-                        matchedKeywords = REGION_ALIASES[key].keywords;
-                        matchedRegionConfig = REGION_ALIASES[key];
-                        break;
+                    if (timeKey === '1h') startTimeStr = new Date(now.getTime() - 60*60*1000).toISOString();
+                    else if (timeKey === '24h') startTimeStr = new Date(now.getTime() - 24*60*60*1000).toISOString();
+                    else if (timeKey === '7d') startTimeStr = new Date(now.getTime() - 7*24*60*60*1000).toISOString();
+                    else if (timeKey === '30d') startTimeStr = new Date(now.getTime() - 30*24*60*60*1000).toISOString();
+                    else if (timeKey === '1y') startTimeStr = new Date(now.getTime() - 365*24*60*60*1000).toISOString();
+                    else if (timeKey === 'custom') {
+                        const startInput = document.getElementById('start-date').value;
+                        const endInput = document.getElementById('end-date').value;
+                        if (startInput) startTimeStr = new Date(startInput).toISOString();
+                        if (endInput) endTimeStr = new Date(endInput + 'T23:59:59').toISOString();
                     }
+
+                    let url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=2000&minmagnitude=${minMag}`;
+                    if (startTimeStr) url += `&starttime=${startTimeStr}`;
+                    if (endTimeStr) url += `&endtime=${endTimeStr}`;
+
+                    if (customBounds) {
+                        url += `&minlatitude=${customBounds.s}&maxlatitude=${customBounds.n}&minlongitude=${customBounds.w}&maxlongitude=${customBounds.e}`;
+                    } else if (App.Config.REGION_BOUNDS[regionKey]) {
+                        const b = App.Config.REGION_BOUNDS[regionKey];
+                        url += `&minlatitude=${b.minlat}&maxlatitude=${b.maxlat}&minlongitude=${b.minlon}&maxlongitude=${b.maxlon}`;
+                    }
+
+                    // USGS FDSN API menolak parameter tidak resmi (seperti _t). Kita murni gunakan header cache: no-store
+                    const response = await fetch(url, { cache: 'no-store' });
+                    if (!response.ok) throw new Error(`USGS API Error: ${response.status} ${response.statusText}`);
+                    const data = await response.json();
+
+                    return data.features.map(f => {
+                        const coords = f.geometry.coordinates;
+                        let mmiVal = f.properties.mmi;
+                        let cdiVal = f.properties.cdi;
+                        
+                        return {
+                            id: f.id,
+                            mag: f.properties.mag || 0,
+                            place: f.properties.place || 'Unknown Location',
+                            time: f.properties.time,
+                            timeFormatted: new Date(f.properties.time).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }),
+                            lat: coords[1], lon: coords[0], depth: coords[2] ? Math.round(coords[2]) : 0,
+                            source: 'USGS',
+                            // SEMANTICS P0: Membedakan MMI (Instrument) dan CDI (Community DYFI)
+                            mmi: mmiVal ? App.Utils.getMMIRoman(mmiVal) : null,
+                            cdi: (!mmiVal && cdiVal) ? App.Utils.getMMIRoman(cdiVal) : null 
+                        };
+                    });
+                },
+
+                async fetchBMKGData() {
+                    const ts = Date.now();
+                    const [res1, res2] = await Promise.all([
+                        fetch(`https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json?_t=${ts}`, { cache: 'no-store' }),
+                        fetch(`https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json?_t=${ts}`, { cache: 'no-store' })
+                    ]);
+                    
+                    let list = [];
+                    if (res1.ok) {
+                        const d = await res1.json();
+                        (d.Infogempa?.gempa || []).forEach(g => list.push(this.parseBMKG(g, 'BMKG M≥5')));
+                    }
+                    if (res2.ok) {
+                        const d = await res2.json();
+                        (d.Infogempa?.gempa || []).forEach(g => list.push(this.parseBMKG(g, 'BMKG Dirasakan')));
+                    }
+
+                    // SEMANTICS P0: Deduplikasi lebih aman menggunakan ID gabungan (Waktu + Lat + Lon)
+                    const unique = [];
+                    const seen = new Set();
+                    list.sort((a, b) => b.time - a.time).forEach(eq => {
+                        const safeId = `${eq.time}_${eq.lat}_${eq.lon}_${eq.mag}`;
+                        if (!seen.has(safeId)) { 
+                            seen.add(safeId); 
+                            unique.push(eq); 
+                        }
+                    });
+                    return unique;
+                },
+
+                parseBMKG(g, source) {
+                    const c = g.Coordinates ? g.Coordinates.split(',') : [0,0];
+                    // BMKG 'Dirasakan' string di-map sebagai CDI/DYFI logic karena dirasakan manusia
+                    const dirasakan = (g.Dirasakan && g.Dirasakan !== '-') ? g.Dirasakan : null;
+                    return {
+                        id: 'bmkg-' + g.DateTime,
+                        mag: parseFloat(g.Magnitude) || 0,
+                        place: g.Wilayah,
+                        time: new Date(g.DateTime || (g.Tanggal + ' ' + g.Jam)).getTime(),
+                        timeFormatted: `${g.Tanggal} - ${g.Jam}`,
+                        lat: parseFloat(c[0]), lon: parseFloat(c[1]), depth: parseFloat(g.Kedalaman) || 0,
+                        source: source,
+                        mmi: null, 
+                        cdi: dirasakan // Masuk kategori dirasakan warga
+                    };
+                },
+
+                exportToCSV() {
+                    if (App.State.currentVisibleData.length === 0) return alert("Tidak ada data untuk diekspor di area layar saat ini.");
+                    let csv = "Waktu,Magnitudo,Kedalaman_km,Latitude,Longitude,Lokasi,Intensitas_Dirasakan,Sumber\n";
+                    App.State.currentVisibleData.forEach(eq => {
+                        // Data sanitization for CSV
+                        let placeStr = App.Utils.escapeHTML(eq.place).replace(/"/g, '""');
+                        let mmiStr = eq.mmi ? `MMI ${eq.mmi}` : (eq.cdi ? `CDI ${eq.cdi}` : '-');
+                        csv += `"${eq.timeFormatted}",${eq.mag},${eq.depth},${eq.lat},${eq.lon},"${placeStr}","${mmiStr}","${eq.source}"\n`;
+                    });
+                    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+                    const a = document.createElement('a'); a.href = url; a.download = `earthquake_data_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
                 }
-            }
+            },
 
-            filteredEarthquakes = rawFetchedEarthquakes.filter(eq => {
-                if (eq.mag < minMag) return false;
-                if (!searchInputVal) return true;
-                const place = eq.place.toLowerCase();
-                return matchedKeywords.some(kw => place.includes(kw));
-            });
+            // MODULE: APPLICATION LOGIC
+            Logic: {
+                async fetchEarthquakeData(isSilent = false) {
+                    const refreshIcon = document.getElementById('refresh-icon');
+                    if (!isSilent) refreshIcon.classList.add('fa-spin');
 
-            // Urutkan data utama 
-            sortData();
-            
-            // Set Banner Data Global Utama (TIDAK terpengaruh Viewport Peta)
-            updateLatestQuakeBanner();
+                    const provider = document.getElementById('api-provider').value;
+                    const regionKey = document.getElementById('region-filter').value;
+                    const timeKey = document.getElementById('time-filter').value;
+                    const minMag = parseFloat(document.getElementById('mag-filter').value) || 0;
+                    
+                    let customBounds = null;
+                    if (regionKey === 'CUSTOM_MAP' && App.Map.instance) {
+                        const bounds = App.Map.instance.getBounds();
+                        customBounds = { s: bounds.getSouth(), n: bounds.getNorth(), w: bounds.getWest(), e: bounds.getEast() };
+                    }
 
-            if (matchedRegionConfig && map) {
-                isMapProgrammaticMove = true; 
-                map.setView(matchedRegionConfig.center, matchedRegionConfig.zoom, { animate: false });
-            }
+                    try {
+                        if (provider === 'USGS') {
+                            App.State.rawFetchedEarthquakes = await App.Data.fetchUSGSData(provider, regionKey, timeKey, minMag, customBounds);
+                        } else {
+                            App.State.rawFetchedEarthquakes = await App.Data.fetchBMKGData();
+                        }
+                        this.applyLocalFilters();
+                    } catch (err) {
+                        console.error(err);
+                    } finally {
+                        if (!isSilent) refreshIcon.classList.remove('fa-spin');
+                    }
+                },
 
-            renderMapMarkers(!!matchedRegionConfig);
-            
-            // Paksa Sinkronisasi Tabel dengan Bounding Box Peta Saat Ini
-            syncTableWithMapBounds();
-            updateSortIcons();
-        }
+                fetchDataForCurrentMapBounds() {
+                    document.getElementById('search-area-btn').classList.add('hidden');
+                    document.getElementById('search-area-btn').classList.remove('flex');
+                    
+                    const regionSelect = document.getElementById('region-filter');
+                    if (![...regionSelect.options].some(o => o.value === 'CUSTOM_MAP')) {
+                        const opt = document.createElement('option');
+                        opt.value = 'CUSTOM_MAP';
+                        opt.text = '📍 Area Peta Saat Ini';
+                        regionSelect.add(opt, 0); 
+                    }
+                    regionSelect.value = 'CUSTOM_MAP';
+                    document.getElementById('search-input').value = '';
+                    this.fetchEarthquakeData();
+                },
 
-        // FUNGSI INTI: Sinkronisasi Tabel & Peta
-        function syncTableWithMapBounds() {
-            if (!map) return;
-            const bounds = map.getBounds();
-            
-            // Saring array master yang sudah disortir menjadi array data yang terlihat di layar
-            currentVisibleData = filteredEarthquakes.filter(eq => {
-                if (isNaN(eq.lat) || isNaN(eq.lon)) return false;
-                const latLng = L.latLng(eq.lat, eq.lon);
-                return bounds.contains(latLng);
-            });
-            
-            // Render UI berdasar data yang terlihat
-            renderTable(currentVisibleData);
-            updateStats(currentVisibleData);
-            updateChart(currentVisibleData);
-        }
+                applyLocalFilters() {
+                    const minMag = parseFloat(document.getElementById('mag-filter').value) || 0;
+                    const searchInputVal = App.Utils.escapeHTML(document.getElementById('search-input').value.toLowerCase().trim());
 
-        function sortData() {
-            const { column, direction } = sortConfig;
-            filteredEarthquakes.sort((a, b) => {
-                if (direction === 'asc') return a[column] > b[column] ? 1 : -1;
-                else return a[column] < b[column] ? 1 : -1;
-            });
-        }
+                    let matchedKeywords = [searchInputVal];
+                    let matchedRegionConfig = null;
 
-        function handleSort(columnKey) {
-            if (sortConfig.column === columnKey) {
-                sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortConfig.column = columnKey;
-                sortConfig.direction = (columnKey === 'depth') ? 'asc' : 'desc'; 
-            }
-            
-            sortData(); // Urutkan array master
-            syncTableWithMapBounds(); // Ekstrak ulang data layar dengan urutan baru
-            updateSortIcons();
-        }
+                    if (searchInputVal) {
+                        for (const key in App.Config.REGION_ALIASES) {
+                            if (App.Config.REGION_ALIASES[key].keywords.some(kw => searchInputVal.includes(kw))) {
+                                matchedKeywords = App.Config.REGION_ALIASES[key].keywords;
+                                matchedRegionConfig = App.Config.REGION_ALIASES[key];
+                                break;
+                            }
+                        }
+                    }
 
-        function updateSortIcons() {
-            ['time', 'mag', 'depth'].forEach(col => {
-                const icon = document.getElementById(`sort-icon-${col}`);
-                if (!icon) return;
-                if (sortConfig.column === col) {
-                    icon.className = sortConfig.direction === 'asc' 
-                        ? 'fa-solid fa-arrow-up-wide-short text-indigo-600 dark:text-indigo-400 font-bold text-xs' 
-                        : 'fa-solid fa-arrow-down-wide-short text-indigo-600 dark:text-indigo-400 font-bold text-xs';
-                } else {
-                    icon.className = 'fa-solid fa-sort text-slate-400 text-[10px]';
+                    App.State.filteredEarthquakes = App.State.rawFetchedEarthquakes.filter(eq => {
+                        if (eq.mag < minMag) return false;
+                        if (!searchInputVal) return true;
+                        const place = eq.place.toLowerCase();
+                        return matchedKeywords.some(kw => place.includes(kw));
+                    });
+
+                    this.sortData();
+                    App.UI.updateLatestQuakeBanner();
+
+                    if (matchedRegionConfig && App.Map.instance) {
+                        App.Map.isProgrammaticMove = true; 
+                        App.Map.instance.setView(matchedRegionConfig.center, matchedRegionConfig.zoom, { animate: false });
+                    }
+
+                    App.Map.renderMarkers(!!matchedRegionConfig);
+                    App.Map.syncTableWithBounds();
+                    App.UI.updateSortIcons();
+                },
+
+                sortData() {
+                    const { column, direction } = App.State.sortConfig;
+                    App.State.filteredEarthquakes.sort((a, b) => {
+                        if (direction === 'asc') return a[column] > b[column] ? 1 : -1;
+                        else return a[column] < b[column] ? 1 : -1;
+                    });
+                },
+
+                handleSort(columnKey) {
+                    if (App.State.sortConfig.column === columnKey) {
+                        App.State.sortConfig.direction = App.State.sortConfig.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        App.State.sortConfig.column = columnKey;
+                        App.State.sortConfig.direction = (columnKey === 'depth') ? 'asc' : 'desc'; 
+                    }
+                    this.sortData();
+                    App.Map.syncTableWithBounds();
+                    App.UI.updateSortIcons();
+                },
+
+                resetFilters() {
+                    document.getElementById('api-provider').value = 'USGS';
+                    document.getElementById('region-filter').value = 'INDONESIA';
+                    document.getElementById('time-filter').value = '7d';
+                    document.getElementById('mag-filter').value = '0';
+                    document.getElementById('mag-val').innerText = '0.0';
+                    document.getElementById('search-input').value = '';
+                    document.getElementById('custom-date-container').classList.add('hidden');
+                    document.getElementById('search-area-btn').classList.add('hidden');
+                    App.UI.toggleProviderSettings();
                 }
-            });
-        }
+            },
 
-        function renderMapMarkers(hasManualRegionFocus = false) {
-            if (!map) return;
-            mapMarkers.forEach(m => map.removeLayer(m));
-            mapMarkers = [];
-            
-            if (filteredEarthquakes.length === 0) return;
+            // MODULE: UI RENDERER
+            UI: {
+                chartInstance: null,
 
-            const bounds = [];
-            filteredEarthquakes.forEach((eq, index) => {
-                if (isNaN(eq.lat) || isNaN(eq.lon)) return;
-                
-                let color = eq.mag >= 6.0 ? '#ef4444' : (eq.mag >= 4.5 ? '#f59e0b' : '#38bdf8');
-                const marker = L.circleMarker([eq.lat, eq.lon], { radius: Math.max(5, eq.mag * 2.8), fillColor: color, color: '#ffffff', weight: 1.5, opacity: 0.9, fillOpacity: 0.75 });
-                
-                let popupContent = `<div class="p-1 text-xs"><div class="font-bold text-slate-800 text-sm mb-1">${eq.place}</div><div><b>M ${eq.mag.toFixed(1)}</b> | ${eq.depth} km | ${eq.timeFormatted}</div>`;
-                
-                // Perbaikan: Selalu tampilkan baris MMI di Popup Marker Peta
-                if (eq.mmiStr !== '-') {
-                    popupContent += `<div class="mt-1.5 text-amber-600 font-semibold border-t border-slate-100 pt-1"><b>MMI:</b> ${eq.mmiStr}</div>`;
-                } else {
-                    popupContent += `<div class="mt-1.5 text-slate-500 border-t border-slate-100 pt-1"><b>MMI:</b> - (Tidak ada laporan)</div>`;
+                initChart() {
+                    const ctx = document.getElementById('magnitudeChart').getContext('2d');
+                    this.chartInstance = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['M < 4.0', 'M 4.0 - 4.9', 'M 5.0 - 5.9', 'M ≥ 6.0'],
+                            datasets: [{
+                                data: [0, 0, 0, 0],
+                                backgroundColor: ['#38bdf8', '#facc15', '#f97316', '#ef4444'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { position: 'bottom', labels: { color: '#475569', font: { size: 11 } } } }
+                        }
+                    });
+                },
+
+                toggleTheme() {
+                    App.State.isDarkMode = !App.State.isDarkMode;
+                    document.documentElement.classList.toggle('dark', App.State.isDarkMode);
+                    document.getElementById('theme-toggle-icon').className = App.State.isDarkMode ? 'fa-solid fa-sun text-amber-400 text-sm' : 'fa-solid fa-moon text-slate-700 text-sm';
+                    App.Map.updateTile();
+                    if (this.chartInstance) {
+                        this.chartInstance.options.plugins.legend.labels.color = App.State.isDarkMode ? '#94a3b8' : '#475569';
+                        this.chartInstance.update();
+                    }
+                },
+
+                toggleProviderSettings() {
+                    const provider = document.getElementById('api-provider').value;
+                    const regionContainer = document.getElementById('region-container');
+                    const timeContainer = document.getElementById('time-container');
+                    
+                    if (provider === 'USGS') {
+                        regionContainer.classList.remove('hidden');
+                        timeContainer.classList.remove('hidden');
+                        document.getElementById('active-source-text').innerText = 'Data Global USGS';
+                    } else {
+                        regionContainer.classList.add('hidden');
+                        timeContainer.classList.add('hidden');
+                        document.getElementById('custom-date-container').classList.add('hidden');
+                        document.getElementById('active-source-text').innerText = 'Data Terbuka BMKG';
+                    }
+                    App.Logic.fetchEarthquakeData();
+                },
+
+                handleTimeFilterChange() {
+                    const val = document.getElementById('time-filter').value;
+                    const customContainer = document.getElementById('custom-date-container');
+                    if (val === 'custom') {
+                        customContainer.classList.remove('hidden');
+                    } else {
+                        customContainer.classList.add('hidden');
+                        App.Logic.fetchEarthquakeData();
+                    }
+                },
+
+                updateSortIcons() {
+                    ['time', 'mag', 'depth'].forEach(col => {
+                        const icon = document.getElementById(`sort-icon-${col}`);
+                        if (!icon) return;
+                        if (App.State.sortConfig.column === col) {
+                            icon.className = App.State.sortConfig.direction === 'asc' 
+                                ? 'fa-solid fa-arrow-up-wide-short text-indigo-600 dark:text-indigo-400 font-bold text-xs' 
+                                : 'fa-solid fa-arrow-down-wide-short text-indigo-600 dark:text-indigo-400 font-bold text-xs';
+                        } else {
+                            icon.className = 'fa-solid fa-sort text-slate-400 text-[10px]';
+                        }
+                    });
+                },
+
+                updateLatestQuakeBanner() {
+                    const banner = document.getElementById('latest-quake-banner');
+                    if (!App.State.rawFetchedEarthquakes.length) return banner.classList.add('hidden');
+                    const latest = [...App.State.rawFetchedEarthquakes].sort((a, b) => b.time - a.time)[0];
+                    if (!latest) return banner.classList.add('hidden');
+                    
+                    banner.classList.remove('hidden');
+                    
+                    // SECURITY P0: Sanitasi teks
+                    const safePlace = App.Utils.escapeHTML(latest.place);
+                    const safeDepth = App.Utils.escapeHTML(latest.depth);
+
+                    document.getElementById('banner-mag').innerText = `M ${latest.mag.toFixed(1)}`;
+                    document.getElementById('banner-title').innerText = safePlace;
+                    document.getElementById('banner-full-time').innerText = latest.timeFormatted;
+                    document.getElementById('banner-depth').innerText = `${safeDepth} km`;
+                    
+                    const minMag = parseFloat(document.getElementById('mag-filter').value) || 0;
+                    const provider = document.getElementById('api-provider').value;
+                    const badge = document.getElementById('banner-badge');
+                    
+                    badge.innerText = provider === 'BMKG' ? "🔴 GEMPA BMKG TERBARU" : `🔴 GEMPA TERBARU (M ≥ ${minMag.toFixed(1)})`;
+                    
+                    const mmiWrapper = document.getElementById('banner-mmi-wrapper');
+                    mmiWrapper.classList.remove('hidden'); 
+                    
+                    // SEMANTICS P0: MMI vs CDI
+                    let intensityLabel = "Tidak ada laporan intensitas";
+                    if (latest.mmi) {
+                        intensityLabel = `MMI: ${App.Utils.escapeHTML(latest.mmi)}`;
+                        mmiWrapper.className = "text-rose-600 dark:text-rose-400 font-bold";
+                    } else if (latest.cdi) {
+                        intensityLabel = `CDI (DYFI): ${App.Utils.escapeHTML(latest.cdi)}`;
+                        mmiWrapper.className = "text-amber-600 dark:text-amber-400 font-medium";
+                    } else {
+                        mmiWrapper.className = "text-slate-500 dark:text-slate-400 font-medium text-xs";
+                    }
+                    
+                    document.getElementById('banner-mmi').innerText = intensityLabel;
+                    document.getElementById('banner-time-ago').innerText = App.Utils.formatTimeAgo(latest.time);
+                },
+
+                renderTable(dataToRender) {
+                    const tbody = document.getElementById('earthquake-table-body');
+                    tbody.innerHTML = ''; // Safe to reset container
+                    
+                    if (dataToRender.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 dark:text-slate-500 font-medium">
+                            <i class="fa-solid fa-earth-americas text-3xl mb-3 block opacity-50"></i>
+                            Tidak ada data gempa di area layar peta ini.<br/>Geser peta (zoom out) atau kurangi filter Magnitudo.
+                        </td></tr>`;
+                        return;
+                    }
+
+                    dataToRender.forEach((eq) => {
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-100/70 dark:hover:bg-slate-800/50 transition cursor-pointer";
+                        let magColor = eq.mag >= 6.0 ? "text-rose-600 dark:text-rose-400 font-bold" : (eq.mag >= 4.5 ? "text-amber-600 dark:text-amber-400 font-semibold" : "text-sky-600 dark:text-sky-400");
+                        
+                        // SECURITY P0: Sanitasi sebelum DOM insertion
+                        const safePlace = App.Utils.escapeHTML(eq.place);
+                        let mmiHTML = `<div class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5"><i class="fa-solid fa-house-crack mr-1"></i>Intensitas: - (Tidak ada laporan)</div>`;
+                        
+                        if (eq.mmi) {
+                            mmiHTML = `<div class="text-[10px] text-rose-600 dark:text-rose-400 font-bold mt-0.5 line-clamp-1" title="ShakeMap MMI"><i class="fa-solid fa-house-crack mr-1"></i>MMI: ${App.Utils.escapeHTML(eq.mmi)}</div>`;
+                        } else if (eq.cdi) {
+                            mmiHTML = `<div class="text-[10px] text-amber-600 dark:text-amber-400 font-medium mt-0.5 line-clamp-1" title="Community DYFI"><i class="fa-solid fa-house-crack mr-1"></i>CDI: ${App.Utils.escapeHTML(eq.cdi)}</div>`;
+                        }
+
+                        // InnerHTML safe because inputs are escaped
+                        tr.innerHTML = `
+                            <td class="p-3 whitespace-nowrap"><div class="font-medium text-slate-800 dark:text-slate-200">${eq.timeFormatted}</div><span class="text-[10px] text-slate-400">${App.Utils.escapeHTML(eq.source)}</span></td>
+                            <td class="p-3 font-mono ${magColor}">M ${eq.mag.toFixed(1)}</td>
+                            <td class="p-3 text-slate-600 dark:text-slate-300">${eq.depth} km</td>
+                            <td class="p-3">
+                                <div class="line-clamp-1 font-medium text-slate-800 dark:text-slate-200" title="${safePlace}">${safePlace}</div>
+                                ${mmiHTML}
+                            </td>
+                            <td class="p-3 text-center">
+                                <button onclick="App.Map.focusOnLatLon(${eq.lat}, ${eq.lon})" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 rounded-lg transition" title="Lihat Lokasi">
+                                    <i class="fa-solid fa-crosshairs"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                },
+
+                updateStats(dataToRender) {
+                    document.getElementById('stat-total').innerText = dataToRender.length;
+                    document.getElementById('result-count-badge').innerText = `${dataToRender.length} Data Area Ini`;
+                    if (dataToRender.length === 0) {
+                        document.getElementById('stat-max-mag').innerText = "0.0";
+                        document.getElementById('stat-max-depth').innerText = "0 km";
+                        document.getElementById('stat-latest-time').innerText = "--";
+                        return;
+                    }
+                    document.getElementById('stat-max-mag').innerText = Math.max(...dataToRender.map(e => e.mag)).toFixed(1);
+                    document.getElementById('stat-max-depth').innerText = `${Math.max(...dataToRender.map(e => e.depth))} km`;
+                    const latest = [...dataToRender].sort((a, b) => b.time - a.time)[0];
+                    document.getElementById('stat-latest-time').innerText = latest ? latest.timeFormatted : "--";
+                },
+
+                updateChart(dataToRender) {
+                    if (!this.chartInstance) return;
+                    let c = [0,0,0,0];
+                    dataToRender.forEach(eq => {
+                        if (eq.mag < 4.0) c[0]++; else if (eq.mag < 5.0) c[1]++; else if (eq.mag < 6.0) c[2]++; else c[3]++;
+                    });
+                    this.chartInstance.data.datasets[0].data = c;
+                    this.chartInstance.update();
                 }
+            },
+
+            // MODULE: GIS & MAP LAYER
+            Map: {
+                instance: null,
+                tileLayer: null,
+                markers: [],
+                isProgrammaticMove: false,
+                isTectonicVisible: false,
+                tectonicLayer: null,
+                indoFaultsLayer: null,
+
+                init() {
+                    if (!this.instance) {
+                        this.instance = L.map('map').setView([-2.5, 118.0], 5);
+                        this.updateTile();
+                        
+                        this.instance.on('moveend', () => {
+                            if (this.isProgrammaticMove) {
+                                this.isProgrammaticMove = false;
+                                this.syncTableWithBounds(); 
+                                return; 
+                            }
+                            if (document.getElementById('api-provider').value === 'USGS') {
+                                document.getElementById('search-area-btn').classList.remove('hidden');
+                                document.getElementById('search-area-btn').classList.add('flex');
+                            }
+                            this.syncTableWithBounds();
+                        });
+                    }
+                },
+
+                updateTile() {
+                    if (!this.instance) return;
+                    if (this.tileLayer) this.instance.removeLayer(this.tileLayer);
+                    
+                    const tileUrl = App.State.isDarkMode 
+                        ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+                        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                        
+                    const attr = App.State.isDarkMode
+                        ? 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+                        : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+                    this.tileLayer = L.tileLayer(tileUrl, { attribution: attr, maxZoom: 18 }).addTo(this.instance);
+                },
+
+                async toggleTectonicPlates() {
+                    const btnText = document.getElementById('tectonic-btn-text');
+                    const disc = document.getElementById('disclaimer-faults');
+                    
+                    if (this.isTectonicVisible) {
+                        if (this.tectonicLayer && this.instance) this.instance.removeLayer(this.tectonicLayer);
+                        if (this.indoFaultsLayer && this.instance) this.instance.removeLayer(this.indoFaultsLayer);
+                        this.isTectonicVisible = false;
+                        btnText.innerText = "Tampilkan Lempeng & Sesar";
+                        disc.classList.add('hidden');
+                        return;
+                    }
+
+                    btnText.innerText = "Memuat...";
+                    try {
+                        if (!this.tectonicLayer) {
+                            const response = await fetch('https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json');
+                            const data = await response.json();
+                            this.tectonicLayer = L.geoJSON(data, {
+                                style: () => ({ color: App.State.isDarkMode ? "#ef4444" : "#f43f5e", weight: 2, opacity: 0.6, dashArray: "4, 6" }),
+                                onEachFeature: (feature, layer) => {
+                                    // SECURITY P0: Sanitasi Feature Peta
+                                    const name = App.Utils.escapeHTML(feature.properties.Name || 'Patahan (Unnamed)');
+                                    layer.bindPopup(`<div class="p-1 text-xs"><div class="font-bold text-rose-600 mb-1">Batas Lempeng (PB2002)</div><div>${name}</div></div>`);
+                                }
+                            });
+                        }
+                        
+                        if (!this.indoFaultsLayer) {
+                            this.indoFaultsLayer = L.geoJSON(App.Config.INDO_FAULTS_GEOJSON, {
+                                style: () => ({ color: "#eab308", weight: 3.5, opacity: 0.9, dashArray: "6, 4" }),
+                                onEachFeature: (feature, layer) => {
+                                    // SECURITY P0: Sanitasi + Disclaimer P0
+                                    const name = App.Utils.escapeHTML(feature.properties.Name);
+                                    const risk = App.Utils.escapeHTML(feature.properties.Risk);
+                                    const src = App.Utils.escapeHTML(feature.properties.Source);
+                                    layer.bindPopup(`<div class="p-1 text-xs"><div class="font-bold text-amber-500 mb-1">Struktur Geologi Lokal</div><div><b>${name}</b></div><div class="text-slate-500 mt-1">Tipe: ${risk}<br/>Source: ${src}</div><hr class="my-1"/><i class="text-[9px] text-slate-400">*Visualisasi pendekatan, bukan rujukan resmi.</i></div>`);
+                                }
+                            });
+                        }
+                        
+                        if (this.instance) {
+                            this.tectonicLayer.setStyle({ color: App.State.isDarkMode ? "#ef4444" : "#f43f5e" });
+                            this.tectonicLayer.addTo(this.instance);
+                            this.indoFaultsLayer.addTo(this.instance);
+                            this.isTectonicVisible = true;
+                            btnText.innerText = "Sembunyikan Lempeng";
+                            disc.classList.remove('hidden');
+                        }
+                    } catch (error) {
+                        btnText.innerText = "Gagal Memuat";
+                        setTimeout(() => { btnText.innerText = "Tampilkan Lempeng & Sesar"; }, 2000);
+                    }
+                },
+
+                renderMarkers(hasManualRegionFocus = false) {
+                    if (!this.instance) return;
+                    this.markers.forEach(m => this.instance.removeLayer(m));
+                    this.markers = [];
+                    
+                    if (App.State.filteredEarthquakes.length === 0) return;
+
+                    const boundsArr = [];
+                    App.State.filteredEarthquakes.forEach((eq) => {
+                        if (isNaN(eq.lat) || isNaN(eq.lon)) return;
+                        
+                        let color = eq.mag >= 6.0 ? '#ef4444' : (eq.mag >= 4.5 ? '#f59e0b' : '#38bdf8');
+                        const marker = L.circleMarker([eq.lat, eq.lon], { radius: Math.max(5, eq.mag * 2.8), fillColor: color, color: '#ffffff', weight: 1.5, opacity: 0.9, fillOpacity: 0.75 });
+                        
+                        // SECURITY P0 & SEMANTICS P0: Map Popup Sanitization & MMI/CDI split
+                        const safePlace = App.Utils.escapeHTML(eq.place);
+                        let popupContent = `<div class="p-1 text-xs"><div class="font-bold text-slate-800 text-sm mb-1">${safePlace}</div><div><b>M ${eq.mag.toFixed(1)}</b> | ${eq.depth} km | ${eq.timeFormatted}</div>`;
+                        
+                        if (eq.mmi) {
+                            popupContent += `<div class="mt-1.5 text-rose-600 font-bold border-t border-slate-100 pt-1"><b>MMI:</b> ${App.Utils.escapeHTML(eq.mmi)}</div>`;
+                        } else if (eq.cdi) {
+                            popupContent += `<div class="mt-1.5 text-amber-600 font-semibold border-t border-slate-100 pt-1"><b>CDI:</b> ${App.Utils.escapeHTML(eq.cdi)}</div>`;
+                        } else {
+                            popupContent += `<div class="mt-1.5 text-slate-500 border-t border-slate-100 pt-1">Intensitas: - (Tidak ada laporan)</div>`;
+                        }
+                        popupContent += `</div>`;
+
+                        marker.bindPopup(popupContent);
+                        marker.addTo(this.instance);
+                        this.markers.push(marker);
+                        boundsArr.push([eq.lat, eq.lon]);
+                    });
+
+                    if (boundsArr.length > 0 && !hasManualRegionFocus) {
+                        this.isProgrammaticMove = true;
+                        this.instance.fitBounds(boundsArr, { padding: [30, 30], maxZoom: 8 });
+                    }
+                },
+
+                syncTableWithBounds() {
+                    if (!this.instance) return;
+                    const bounds = this.instance.getBounds();
+                    
+                    App.State.currentVisibleData = App.State.filteredEarthquakes.filter(eq => {
+                        if (isNaN(eq.lat) || isNaN(eq.lon)) return false;
+                        const latLng = L.latLng(eq.lat, eq.lon);
+                        return bounds.contains(latLng);
+                    });
+                    
+                    App.UI.renderTable(App.State.currentVisibleData);
+                    App.UI.updateStats(App.State.currentVisibleData);
+                    App.UI.updateChart(App.State.currentVisibleData);
+                },
+
+                focusLatestEvent() {
+                    const eq = [...App.State.rawFetchedEarthquakes].sort((a, b) => b.time - a.time)[0];
+                    if (eq) this.focusOnLatLon(eq.lat, eq.lon);
+                },
+
+                focusOnLatLon(lat, lon) {
+                    if (!this.instance || isNaN(lat) || isNaN(lon)) return;
+                    this.isProgrammaticMove = true;
+                    this.instance.setView([lat, lon], 8, { animate: true });
+                }
+            },
+
+            // MODULE: LIFECYCLE
+            init() {
+                App.Map.init();
+                App.UI.initChart();
+                App.Logic.fetchEarthquakeData();
                 
-                popupContent += `</div>`;
-
-                marker.bindPopup(popupContent);
-                marker.addTo(map);
-                mapMarkers.push(marker);
-                bounds.push([eq.lat, eq.lon]);
-            });
-
-            if (bounds.length > 0 && !hasManualRegionFocus) {
-                isMapProgrammaticMove = true;
-                map.fitBounds(bounds, { padding: [30, 30], maxZoom: 8 });
-            }
-        }
-
-        function renderTable(dataToRender) {
-            const tbody = document.getElementById('earthquake-table-body');
-            tbody.innerHTML = '';
-            
-            if (dataToRender.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 dark:text-slate-500 font-medium">
-                    <i class="fa-solid fa-earth-americas text-3xl mb-3 block opacity-50"></i>
-                    Tidak ada data gempa di area layar peta ini.<br/>Geser peta (zoom out) atau kurangi filter Magnitudo.
-                </td></tr>`;
-                return;
-            }
-
-            dataToRender.forEach((eq) => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-100/70 dark:hover:bg-slate-800/50 transition cursor-pointer";
-                let magColor = eq.mag >= 6.0 ? "text-rose-600 dark:text-rose-400 font-bold" : (eq.mag >= 4.5 ? "text-amber-600 dark:text-amber-400 font-semibold" : "text-sky-600 dark:text-sky-400");
+                // Live ticker
+                setInterval(() => {
+                    const texts = document.getElementById('banner-time-ago');
+                    if (texts && App.State.rawFetchedEarthquakes.length) {
+                         const latest = [...App.State.rawFetchedEarthquakes].sort((a, b) => b.time - a.time)[0];
+                         texts.innerText = App.Utils.formatTimeAgo(latest.time);
+                    }
+                }, 60000);
                 
-                tr.innerHTML = `
-                    <td class="p-3 whitespace-nowrap"><div class="font-medium text-slate-800 dark:text-slate-200">${eq.timeFormatted}</div><span class="text-[10px] text-slate-400">${eq.source}</span></td>
-                    <td class="p-3 font-mono ${magColor}">M ${eq.mag.toFixed(1)}</td>
-                    <td class="p-3 text-slate-600 dark:text-slate-300">${eq.depth} km</td>
-                    <td class="p-3">
-                        <div class="line-clamp-1 font-medium text-slate-800 dark:text-slate-200" title="${eq.place}">${eq.place}</div>
-                        ${eq.mmiStr !== '-' 
-                            ? `<div class="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5 line-clamp-1" title="${eq.mmiStr}"><i class="fa-solid fa-house-crack mr-1"></i>MMI: ${eq.mmiStr}</div>` 
-                            : `<div class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5"><i class="fa-solid fa-house-crack mr-1"></i>MMI: - (Tidak ada laporan)</div>`}
-                    </td>
-                    <td class="p-3 text-center">
-                        <button onclick="focusMapOnLatLon(${eq.lat}, ${eq.lon})" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 rounded-lg transition" title="Lihat Lokasi">
-                            <i class="fa-solid fa-crosshairs"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function updateStats(dataToRender) {
-            document.getElementById('stat-total').innerText = dataToRender.length;
-            document.getElementById('result-count-badge').innerText = `${dataToRender.length} Data Area Ini`;
-            if (dataToRender.length === 0) {
-                document.getElementById('stat-max-mag').innerText = "0.0";
-                document.getElementById('stat-max-depth').innerText = "0 km";
-                document.getElementById('stat-latest-time').innerText = "--";
-                return;
+                // Auto Refresh Data API Background
+                setInterval(() => {
+                    App.Logic.fetchEarthquakeData(true);
+                }, 3 * 60 * 1000);
             }
-            document.getElementById('stat-max-mag').innerText = Math.max(...dataToRender.map(e => e.mag)).toFixed(1);
-            document.getElementById('stat-max-depth').innerText = `${Math.max(...dataToRender.map(e => e.depth))} km`;
-            const latest = [...dataToRender].sort((a, b) => b.time - a.time)[0];
-            document.getElementById('stat-latest-time').innerText = latest ? latest.timeFormatted : "--";
-        }
+        };
 
-        function updateChart(dataToRender) {
-            if (!chart) return;
-            let c = [0,0,0,0];
-            dataToRender.forEach(eq => {
-                if (eq.mag < 4.0) c[0]++; else if (eq.mag < 5.0) c[1]++; else if (eq.mag < 6.0) c[2]++; else c[3]++;
-            });
-            chart.data.datasets[0].data = c;
-            chart.update();
-        }
-
-        function updateLatestQuakeBanner() {
-            const banner = document.getElementById('latest-quake-banner');
-            if (!rawFetchedEarthquakes.length) return banner.classList.add('hidden');
-            const latest = [...rawFetchedEarthquakes].sort((a, b) => b.time - a.time)[0];
-            if (!latest) return banner.classList.add('hidden');
-            
-            banner.classList.remove('hidden');
-            document.getElementById('banner-mag').innerText = `M ${latest.mag.toFixed(1)}`;
-            document.getElementById('banner-title').innerText = latest.place;
-            document.getElementById('banner-full-time').innerText = latest.timeFormatted;
-            document.getElementById('banner-depth').innerText = `${latest.depth} km`;
-            
-            // Ubah Label Banner secara dinamis menyesuaikan filter agar tidak membingungkan
-            const minMag = parseFloat(document.getElementById('mag-filter').value) || 0;
-            const provider = document.getElementById('api-provider').value;
-            const badge = document.getElementById('banner-badge');
-            
-            if (provider === 'BMKG') {
-                badge.innerText = "🔴 GEMPA BMKG TERBARU";
-            } else {
-                badge.innerText = `🔴 GEMPA TERBARU (M ≥ ${minMag.toFixed(1)})`;
-            }
-            
-            const mmiWrapper = document.getElementById('banner-mmi-wrapper');
-            mmiWrapper.classList.remove('hidden'); // Selalu tampilkan wrapper MMI
-            
-            if (latest.mmiStr && latest.mmiStr !== '-') {
-                mmiWrapper.className = "text-amber-600 dark:text-amber-400 font-medium";
-                document.getElementById('banner-mmi').innerText = latest.mmiStr;
-            } else {
-                mmiWrapper.className = "text-slate-500 dark:text-slate-400 font-medium text-xs";
-                document.getElementById('banner-mmi').innerText = "Tidak ada laporan";
-            }
-            
-            const diffMin = Math.floor((Date.now() - latest.time) / 60000);
-            document.getElementById('banner-time-ago').innerText = diffMin < 60 ? `${Math.max(1, diffMin)} mnt lalu` : (diffMin < 1440 ? `${Math.floor(diffMin/60)} jam lalu` : `${Math.floor(diffMin/1440)} hr lalu`);
-        }
-
-        function focusMapOnEvent(index) {
-            // Dipanggil khusus dari Banner Gempa Global Utama
-            const eq = [...rawFetchedEarthquakes].sort((a, b) => b.time - a.time)[index];
-            focusMapOnLatLon(eq.lat, eq.lon);
-        }
-
-        function focusMapOnLatLon(lat, lon) {
-            if (!map || isNaN(lat) || isNaN(lon)) return;
-            isMapProgrammaticMove = true;
-            map.setView([lat, lon], 8, { animate: true });
-        }
-
-        function exportToCSV() {
-            if (currentVisibleData.length === 0) return alert("Tidak ada data untuk diekspor di area layar saat ini.");
-            let csv = "Waktu,Magnitudo,Kedalaman_km,Latitude,Longitude,Lokasi,MMI_Dirasakan,Sumber\n";
-            currentVisibleData.forEach(eq => {
-                csv += `"${eq.timeFormatted}",${eq.mag},${eq.depth},${eq.lat},${eq.lon},"${eq.place.replace(/"/g, '""')}","${eq.mmiStr.replace(/"/g, '""')}","${eq.source}"\n`;
-            });
-            const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-            const a = document.createElement('a'); a.href = url; a.download = `earthquake_data_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
-        }
+        // Bootstrap App on Load
+        window.onload = function() {
+            App.init();
+        };
     </script>
 </body>
 </html>
