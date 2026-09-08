@@ -392,6 +392,42 @@
                     </div>
                 </div>
 
+                <!-- Status Filter Pills Bar -->
+                <div class="px-4 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar py-0.5" id="volcano-status-filter-group">
+                        <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mr-1 flex items-center gap-1">
+                            <i class="fa-solid fa-filter text-amber-500"></i> Status:
+                        </span>
+                        
+                        <!-- Filter: Semua -->
+                        <button id="volc-filter-all" onclick="App.UI.setVolcanoStatusFilter('all')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 bg-slate-800 text-white dark:bg-white dark:text-slate-900 shadow-xs cursor-pointer" title="Tampilkan semua status Waspada, Siaga, dan Awas">
+                            <span>Semua</span>
+                            <span id="volc-badge-all" class="px-1.5 py-0.2 rounded-full bg-slate-700 dark:bg-slate-200 text-[10px]">--</span>
+                        </button>
+                        
+                        <!-- Filter: Awas (Level IV) -->
+                        <button id="volc-filter-awas" onclick="App.UI.setVolcanoStatusFilter('awas')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-rose-50 hover:text-rose-700 dark:hover:bg-rose-950/40 dark:hover:text-rose-300 border border-slate-200 dark:border-slate-700 cursor-pointer" title="Hanya tampilkan gunung berapi Level IV (Awas)">
+                            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                            <span>Awas</span>
+                            <span id="volc-badge-awas" class="px-1.5 py-0.2 rounded-full bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-200 text-[10px]">0</span>
+                        </button>
+
+                        <!-- Filter: Siaga (Level III) -->
+                        <button id="volc-filter-siaga" onclick="App.UI.setVolcanoStatusFilter('siaga')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-orange-50 hover:text-orange-700 dark:hover:bg-orange-950/40 dark:hover:text-orange-300 border border-slate-200 dark:border-slate-700 cursor-pointer" title="Hanya tampilkan gunung berapi Level III (Siaga)">
+                            <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                            <span>Siaga</span>
+                            <span id="volc-badge-siaga" class="px-1.5 py-0.2 rounded-full bg-orange-100 dark:bg-orange-900/60 text-orange-800 dark:text-orange-200 text-[10px]">--</span>
+                        </button>
+
+                        <!-- Filter: Waspada (Level II) -->
+                        <button id="volc-filter-waspada" onclick="App.UI.setVolcanoStatusFilter('waspada')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-50 hover:text-amber-700 dark:hover:bg-amber-950/40 dark:hover:text-amber-300 border border-slate-200 dark:border-slate-700 cursor-pointer" title="Hanya tampilkan gunung berapi Level II (Waspada)">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            <span>Waspada</span>
+                            <span id="volc-badge-waspada" class="px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 text-[10px]">--</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="max-h-[380px] overflow-y-auto custom-scrollbar relative">
                     <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300 relative">
                         <thead class="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 uppercase font-semibold sticky top-0 border-b border-slate-200 dark:border-slate-800 select-none z-20 shadow-sm">
@@ -421,25 +457,37 @@
                         <span class="text-[10px] text-slate-400 font-mono">69 Gunung Termonitor</span>
                     </div>
                     
-                    <!-- 4 Activity Level Stats Grid -->
+                    <!-- 4 Activity Level Stats Grid (Clickable) -->
                     <div class="grid grid-cols-2 gap-2 mb-3.5">
-                        <div class="bg-rose-50 dark:bg-rose-950/30 p-2.5 rounded-xl border border-rose-200 dark:border-rose-900/40">
-                            <div class="text-[10px] font-bold text-rose-700 dark:text-rose-400 uppercase">Level IV Awas</div>
+                        <div onclick="App.UI.setVolcanoStatusFilter('awas')" class="bg-rose-50 dark:bg-rose-950/30 p-2.5 rounded-xl border border-rose-200 dark:border-rose-900/40 cursor-pointer hover:border-rose-400 dark:hover:border-rose-600 hover:shadow-xs transition group" title="Klik untuk menyaring tabel khusus Level IV Awas">
+                            <div class="text-[10px] font-bold text-rose-700 dark:text-rose-400 uppercase flex items-center justify-between">
+                                <span>Level IV Awas</span>
+                                <i class="fa-solid fa-filter text-[8px] opacity-0 group-hover:opacity-100 transition"></i>
+                            </div>
                             <div id="stat-awas-val" class="text-xl font-black text-rose-800 dark:text-rose-200 mt-0.5">0</div>
                             <div class="text-[9px] text-rose-600/80 dark:text-rose-400/80">Kritis / Evakuasi</div>
                         </div>
-                        <div class="bg-orange-50 dark:bg-orange-950/30 p-2.5 rounded-xl border border-orange-200 dark:border-orange-900/40">
-                            <div class="text-[10px] font-bold text-orange-700 dark:text-orange-400 uppercase">Level III Siaga</div>
+                        <div onclick="App.UI.setVolcanoStatusFilter('siaga')" class="bg-orange-50 dark:bg-orange-950/30 p-2.5 rounded-xl border border-orange-200 dark:border-orange-900/40 cursor-pointer hover:border-orange-400 dark:hover:border-orange-600 hover:shadow-xs transition group" title="Klik untuk menyaring tabel khusus Level III Siaga">
+                            <div class="text-[10px] font-bold text-orange-700 dark:text-orange-400 uppercase flex items-center justify-between">
+                                <span>Level III Siaga</span>
+                                <i class="fa-solid fa-filter text-[8px] opacity-0 group-hover:opacity-100 transition"></i>
+                            </div>
                             <div id="stat-siaga-val" class="text-xl font-black text-orange-800 dark:text-orange-200 mt-0.5">0</div>
                             <div class="text-[9px] text-orange-600/80 dark:text-orange-400/80">Aktivitas Sangat Nyata</div>
                         </div>
-                        <div class="bg-amber-50 dark:bg-amber-950/30 p-2.5 rounded-xl border border-amber-200 dark:border-amber-900/40">
-                            <div class="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase">Level II Waspada</div>
+                        <div onclick="App.UI.setVolcanoStatusFilter('waspada')" class="bg-amber-50 dark:bg-amber-950/30 p-2.5 rounded-xl border border-amber-200 dark:border-amber-900/40 cursor-pointer hover:border-amber-400 dark:hover:border-amber-600 hover:shadow-xs transition group" title="Klik untuk menyaring tabel khusus Level II Waspada">
+                            <div class="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase flex items-center justify-between">
+                                <span>Level II Waspada</span>
+                                <i class="fa-solid fa-filter text-[8px] opacity-0 group-hover:opacity-100 transition"></i>
+                            </div>
                             <div id="stat-waspada-val" class="text-xl font-black text-amber-800 dark:text-amber-200 mt-0.5">0</div>
                             <div class="text-[9px] text-amber-600/80 dark:text-amber-400/80">Di Atas Batas Normal</div>
                         </div>
-                        <div class="bg-emerald-50 dark:bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-900/40">
-                            <div class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase">Level I Normal</div>
+                        <div onclick="App.UI.setVolcanoStatusFilter('all')" class="bg-emerald-50 dark:bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-900/40 cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-600 hover:shadow-xs transition group" title="Klik untuk menampilkan semua gunung berapi aktif">
+                            <div class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase flex items-center justify-between">
+                                <span>Level I Normal</span>
+                                <i class="fa-solid fa-filter text-[8px] opacity-0 group-hover:opacity-100 transition"></i>
+                            </div>
                             <div id="stat-normal-val" class="text-xl font-black text-emerald-800 dark:text-emerald-200 mt-0.5">0</div>
                             <div class="text-[9px] text-emerald-600/80 dark:text-emerald-400/80">Aktivitas Dasar</div>
                         </div>

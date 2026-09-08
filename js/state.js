@@ -20,5 +20,6 @@ App.State = {
     volcanoStats: { awas: 0, siaga: 0, waspada: 0, normal: 0, total: 0 },
     isVolcanoVisible: true,
     volcanoFilter: 'elevated',
+    volcanoStatusFilter: 'all',
     volcanoLastUpdated: null
 };

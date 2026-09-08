@@ -266,33 +266,80 @@ App.UI = {
         if (statWaspada) statWaspada.innerText = stats.waspada || 0;
         if (statNormal) statNormal.innerText = stats.normal || 0;
 
-        this.renderVolcanoTable();
+        // Update filter badge counts
+        const countAll = (stats.awas || 0) + (stats.siaga || 0) + (stats.waspada || 0);
+        const badgeAll = document.getElementById('volc-badge-all');
+        const badgeAwas = document.getElementById('volc-badge-awas');
+        const badgeSiaga = document.getElementById('volc-badge-siaga');
+        const badgeWaspada = document.getElementById('volc-badge-waspada');
+        if (badgeAll) badgeAll.innerText = countAll;
+        if (badgeAwas) badgeAwas.innerText = stats.awas || 0;
+        if (badgeSiaga) badgeSiaga.innerText = stats.siaga || 0;
+        if (badgeWaspada) badgeWaspada.innerText = stats.waspada || 0;
+
+        this.filterVolcanoTable();
+    },
+
+    setVolcanoStatusFilter(status) {
+        App.State.volcanoStatusFilter = status;
+
+        const btnAll = document.getElementById('volc-filter-all');
+        const btnAwas = document.getElementById('volc-filter-awas');
+        const btnSiaga = document.getElementById('volc-filter-siaga');
+        const btnWaspada = document.getElementById('volc-filter-waspada');
+
+        const inactiveBase = "px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 cursor-pointer";
+
+        if (btnAll) btnAll.className = inactiveBase + " hover:bg-slate-200 dark:hover:bg-slate-700";
+        if (btnAwas) btnAwas.className = inactiveBase + " hover:bg-rose-50 hover:text-rose-700 dark:hover:bg-rose-950/40 dark:hover:text-rose-300";
+        if (btnSiaga) btnSiaga.className = inactiveBase + " hover:bg-orange-50 hover:text-orange-700 dark:hover:bg-orange-950/40 dark:hover:text-orange-300";
+        if (btnWaspada) btnWaspada.className = inactiveBase + " hover:bg-amber-50 hover:text-amber-700 dark:hover:bg-amber-950/40 dark:hover:text-amber-300";
+
+        if (status === 'all' && btnAll) {
+            btnAll.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 bg-slate-800 text-white dark:bg-white dark:text-slate-900 shadow-xs cursor-pointer";
+        } else if (status === 'awas' && btnAwas) {
+            btnAwas.className = "px-2.5 py-1 rounded-lg text-[11px] font-black transition flex items-center gap-1.5 bg-rose-600 text-white shadow-xs border border-rose-600 cursor-pointer";
+        } else if (status === 'siaga' && btnSiaga) {
+            btnSiaga.className = "px-2.5 py-1 rounded-lg text-[11px] font-black transition flex items-center gap-1.5 bg-orange-500 text-white shadow-xs border border-orange-500 cursor-pointer";
+        } else if (status === 'waspada' && btnWaspada) {
+            btnWaspada.className = "px-2.5 py-1 rounded-lg text-[11px] font-black transition flex items-center gap-1.5 bg-amber-500 text-white shadow-xs border border-amber-500 cursor-pointer";
+        }
+
+        this.filterVolcanoTable();
     },
 
     renderVolcanoTable(dataToRender = null) {
+        if (dataToRender === null) {
+            this.filterVolcanoTable();
+            return;
+        }
+
         const tbody = document.getElementById('volcano-table-body');
         if (!tbody) return;
         
-        // Filter khusus Waspada (Level 2), Siaga (Level 3), Awas (Level 4)
-        const elevatedVolcanoes = dataToRender !== null ? dataToRender : (App.State.volcanoes || []).filter(v => v.level >= 2);
-        
         const countBadge = document.getElementById('volcano-table-count-badge');
         if (countBadge) {
-            countBadge.innerText = `${elevatedVolcanoes.length} Gunung`;
+            countBadge.innerText = `${dataToRender.length} Gunung`;
         }
         
         tbody.innerHTML = '';
         
-        if (elevatedVolcanoes.length === 0) {
+        if (dataToRender.length === 0) {
+            const statusFilter = App.State.volcanoStatusFilter || 'all';
+            let label = 'Waspada/Siaga/Awas';
+            if (statusFilter === 'awas') label = 'Level IV (Awas)';
+            else if (statusFilter === 'siaga') label = 'Level III (Siaga)';
+            else if (statusFilter === 'waspada') label = 'Level II (Waspada)';
+
             tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 dark:text-slate-500 font-medium">
                 <i class="fa-solid fa-volcano text-3xl mb-3 block opacity-50"></i>
-                Tidak ada data gunung api berstatus Waspada/Siaga/Awas yang cocok dengan pencarian.
+                Tidak ada data gunung api berstatus <strong>${label}</strong> yang cocok dengan kriteria pencarian.
             </td></tr>`;
             return;
         }
         
         // Urutkan dari level tertinggi (Level 4 Awas -> Level 3 Siaga -> Level 2 Waspada) lalu nama
-        const sorted = [...elevatedVolcanoes].sort((a, b) => (b.level - a.level) || a.nama.localeCompare(b.nama));
+        const sorted = [...dataToRender].sort((a, b) => (b.level - a.level) || a.nama.localeCompare(b.nama));
         
         sorted.forEach(v => {
             const tr = document.createElement('tr');
@@ -353,21 +400,27 @@ App.UI = {
     filterVolcanoTable() {
         const input = document.getElementById('volcano-search-input');
         const query = (input ? input.value : '').toLowerCase().trim();
-        const elevated = (App.State.volcanoes || []).filter(v => v.level >= 2);
-        
-        if (!query) {
-            this.renderVolcanoTable(elevated);
-            return;
-        }
-        
-        const filtered = elevated.filter(v => {
-            return (v.nama && v.nama.toLowerCase().includes(query)) ||
-                   (v.provinsi && v.provinsi.toLowerCase().includes(query)) ||
-                   (v.status && v.status.toLowerCase().includes(query)) ||
-                   (v.level_text && v.level_text.toLowerCase().includes(query));
+        const statusFilter = App.State.volcanoStatusFilter || 'all';
+
+        // 1. Saring berdasarkan status terpilih (Awas, Siaga, Waspada, atau Semua)
+        let list = (App.State.volcanoes || []).filter(v => {
+            if (statusFilter === 'awas') return v.level === 4;
+            if (statusFilter === 'siaga') return v.level === 3;
+            if (statusFilter === 'waspada') return v.level === 2;
+            return v.level >= 2; // default: elevated (Waspada, Siaga, Awas)
         });
         
-        this.renderVolcanoTable(filtered);
+        // 2. Saring teks pencarian (nama, provinsi, status)
+        if (query) {
+            list = list.filter(v => {
+                return (v.nama && v.nama.toLowerCase().includes(query)) ||
+                       (v.provinsi && v.provinsi.toLowerCase().includes(query)) ||
+                       (v.status && v.status.toLowerCase().includes(query)) ||
+                       (v.level_text && v.level_text.toLowerCase().includes(query));
+            });
+        }
+        
+        this.renderVolcanoTable(list);
     },
 
     showToast(message, type = 'success') {
