@@ -8,6 +8,7 @@ window.App = window.App || {};
 App.init = function() {
     App.Map.init();
     App.UI.initChart();
+    if (App.AI && App.AI.init) App.AI.init();
     App.Logic.fetchEarthquakeData();
     App.Data.fetchVolcanoData(); // Auto-load 69 PVMBG active volcanoes on startup
     

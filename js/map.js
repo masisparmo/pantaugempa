@@ -210,6 +210,9 @@ App.Map = {
         App.UI.renderTable(App.State.currentVisibleData);
         App.UI.updateStats(App.State.currentVisibleData);
         App.UI.updateChart(App.State.currentVisibleData);
+        if (window.App.AI && typeof window.App.AI.analyzeCurrentView === 'function') {
+            window.App.AI.analyzeCurrentView();
+        }
     },
 
     /**

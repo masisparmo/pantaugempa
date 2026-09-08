@@ -278,6 +278,9 @@ App.UI = {
         if (badgeWaspada) badgeWaspada.innerText = stats.waspada || 0;
 
         this.filterVolcanoTable();
+        if (window.App.AI && typeof window.App.AI.analyzeCurrentView === 'function') {
+            window.App.AI.analyzeCurrentView();
+        }
     },
 
     setVolcanoStatusFilter(status) {

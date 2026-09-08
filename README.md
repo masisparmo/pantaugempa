@@ -69,7 +69,19 @@ Aplikasi ini dapat diakses langsung secara online melalui: **[https://pantaugemp
 
 ---
 
-### ℹ️ 5. Glosarium Edukasi & Bantuan (About Modal)
+### 🤖 5. AI Situational Analysis & Travel Advisory (Sistem Pakar Hibrida + Gemini 2.5 Flash)
+- **Panel Peringatan & Rekomendasi Keselamatan Perjalanan**: Ditempatkan tepat di bawah peta interaktif untuk memberikan arahan langsung kepada masyarakat, pelancong (*travelers*), dan pegiat alam terbuka (*hikers*).
+- **Sistem Pakar Spasial Instan (Tanpa Kunci API - 100% Gratis)**:
+  - Berjalan langsung di peramban pengguna (*client-side*) secara instan tanpa biaya dan tanpa perlu API key.
+  - Memanfaatkan kalkulasi jarak geodesik Haversine, deteksi kluster gempa susulan (*aftershock swarms*), tumpang-tindih multi-bahaya (*multi-hazard overlap*), dan scoring level ancaman (*Normal, Waspada, Siaga, Awas*).
+- **Analisis Mendalam Opsional dengan Google Gemini 2.5 Flash**:
+  - Pengguna dapat memasukkan Google Gemini API Key milik sendiri untuk menghasilkan narasi mendalam seputar dinamika tektono-vulkanik, analisis sesar, dan rencana keselamatan rute.
+  - Menggunakan model mutakhir **`gemini-2.5-flash`**.
+  - **Privasi & Keamanan Terjamin**: API Key disimpan secara eksklusif di `localStorage` perangkat pengguna dan dikirim langsung ke endpoint resmi Google AI tanpa perantara server pihak ketiga.
+
+---
+
+### ℹ️ 6. Glosarium Edukasi & Bantuan (About Modal)
 - Penjelasan lengkap arti 4 tingkatan aktivitas gunung api PVMBG:
   - **Level I (Normal)**: Aktivitas dasar, aman beraktivitas.
   - **Level II (Waspada)**: Peningkatan aktivitas seismik di atas normal.
@@ -85,17 +97,18 @@ Proyek ini dibangun menggunakan arsitektur **Modular Vanilla JavaScript & CSS** 
 
 ```text
 Pantau Gempa/
-├── index.html                    # Layout semantik HTML & kerangka tampilan (~679 baris)
+├── index.html                    # Layout semantik HTML & kerangka antarmuka
 ├── css/
-│   └── style.css                 # Styling kustom (Leaflet popup, scrollbar, fullscreen, tombol detail)
+│   └── style.css                 # Styling kustom (Leaflet popup, scrollbar, fullscreen, panel AI)
 ├── js/
 │   ├── config.js                 # Konfigurasi tile map, alias wilayah Indonesia, batas geo & endpoint API
 │   ├── utils.js                  # Sanitasi XSS (escapeHTML), konversi MMI Romawi, format waktu relatif
 │   ├── state.js                  # Centralized state management (gempa, gunung api, filter, tema gelap)
 │   ├── data.js                   # Komunikasi API (USGS, BMKG, PVMBG MAGMA) & ekspor CSV
 │   ├── logic.js                  # Logika filter wilayah, magnitudo, sorting, dan filter viewport peta
-│   ├── map.js                    # Leaflet GIS engine, layer lempeng/sesar, marker gempa & marker gunung api
-│   ├── ui.js                     # Renderer tabel, grafik Chart.js, filter status gunung api & toast
+│   ├── map.js                    # Leaflet GIS engine, layer lempeng/sesar, marker gempa & gunung api
+│   ├── ai.js                     # Sistem Pakar Spasial instan, deteksi swarms & integrasi Gemini 2.5 Flash
+│   ├── ui.js                     # Renderer tabel, grafik Chart.js, filter status gunung api & modal
 │   └── app.js                    # Bootstrap inisialisasi aplikasi dan background auto-refresh timer
 ├── data/
 │   ├── gunung-api.json           # Data lokal 69 gunung api aktif PVMBG MAGMA Indonesia
@@ -180,13 +193,67 @@ Saat halaman selesai dimuat (`DOMContentLoaded`), fungsi `App.init()` di [`js/ap
   - Tombol **"Peta"** pada tabel memicu `App.Map.focusVolcano(id)` yang menggulirkan layar ke peta, memusatkan koordinat (`setView`), dan otomatis membuka popup status detail.
   - Kartu statistik Level IV, III, dan II di panel kanan dapat diklik langsung (*interactive click*) untuk menyaring tabel secara cepat.
 
-### 6. Logika Mode Layar Penuh & Reparenting Modal (*Fullscreen Top-Layer Logic*)
+### 6. Logika Sistem Pakar AI & Anjuran Keselamatan (AI Situational Analysis & Travel Advisory Logic)
+
+Fitur analisis keselamatan memadukan pendekatan **Arsitektur Hibrida Dua Tingkat (*Two-Tier Hybrid Architecture*)**:
+
+```mermaid
+flowchart TD
+    A[Viewport Peta Berubah / Data Dimuat] --> B[App.AI.analyzeCurrentView]
+    B --> C[Hitung Jarak Geodesik: Rumus Haversine]
+    C --> D[Deteksi Kluster Gempa Susulan: Radius 60 km, Waktu 72 jam]
+    C --> E[Deteksi Multi-Hazard Overlap: Gempa <= 35 km dari Gunung Api]
+    
+    D --> F[Evaluasi Skor Ancaman: Normal, Waspada, Siaga, Awas]
+    E --> F
+    
+    F --> G[Render Panel AI Instan: Ringkasan & Anjuran Perjalanan]
+    
+    G --> H{Pengguna Meminta Analisis Mendalam?}
+    H -- Tidak / Tanpa API Key --> I[Sistem Pakar Instan Tetap Berjalan 100% Gratis]
+    H -- Ya / Klik 'Analisis Gemini 2.5' --> J{Kunci API Ada di LocalStorage?}
+    J -- Belum Ada --> K[Tampilkan Modal Input Kunci API Gemini]
+    J -- Ada --> L[Kirim Konteks Grounding Empiris ke Gemini 2.5 Flash]
+    L --> M[Render Laporan Geologis & Travel Advisory Komprehensif di Modal]
+```
+
+#### A. Tingkat 1: Sistem Pakar Spasial Klien (*Client-Side Geospatial Expert System - Zero API Key*)
+- **100% Berjalan Lokal & Instan**: Tidak membebani kuota API dan dapat bekerja tanpa ketergantungan koneksi ke layanan AI eksternal.
+- **Kalkulasi Geodesik Haversine**: Menghitung jarak melengkung di permukaan bumi antarkoordinat lintang/bujur secara matematis presisi:
+  $$d = 2R \arcsin\left(\sqrt{\sin^2\left(\frac{\Delta \phi}{2}\right) + \cos(\phi_1)\cos(\phi_2)\sin^2\left(\frac{\Delta \lambda}{2}\right)}\right)$$
+  dengan radius rata-rata bumi $R = 6371\text{ km}$.
+- **Deteksi Kluster Gempa Susulan (*Aftershock Swarms*)**: Menelusuri setiap gempa utama (*mainshock* dengan $M \ge 4.8$) dan menghitung gempa susulan yang terjadi dalam radius spasial $\le 60\text{ km}$ dan rentang temporal $\le 72\text{ jam}$. Jika terdeteksi $\ge 2$ gempa susulan, sistem menetapkan status kluster aktif yang berisiko merapuhkan lereng perbukitan dan memicu tanah longsor.
+- **Deteksi Tumpang-Tindih Multi-Bahaya (*Multi-Hazard Overlap*)**: Mengidentifikasi kejadian gempa bumi yang episentrumnya berjarak $\le 35\text{ km}$ dari kubah/kawah gunung berapi aktif (Level II–IV). Fenomena ini dianalisis sebagai indikasi interaksi seismovulkanik yang memerlukan kehati-hatian ekstra.
+- **Penetapan Level Ancaman (*Threat Level Scoring*)**:
+  - 🔴 **AWAS**: Terdeteksi gunung api Level IV (Awas) atau gempa bumi kuat $M \ge 6.5$ pada area pandang.
+  - 🟠 **SIAGA**: Terdeteksi gunung api Level III (Siaga), kluster gempa susulan aktif, gempa dangkal di dekat tubuh gunung api aktif, atau gempa bumi $M \ge 5.0$.
+  - 🟡 **WASPADA**: Terdeteksi gunung api Level II (Waspada) atau gempa bumi $M \ge 4.0$.
+  - 🟢 **NORMAL**: Kondisi seismovulkanik di area pandang dalam batas fluktuasi normal.
+- **Formulasi Anjuran Perjalanan Praktis (*Actionable Travel Advisory*)**: Menghasilkan poin-poin anjuran keselamatan untuk pelancong dan pendaki gunung (larangan melintasi radius bahaya sektoral, penangguhan aktivitas pendakian, kewaspadaan terhadap bahaya sekunder seperti lahar hujan dan gas beracun, serta kesiapsiagaan jalur evakuasi).
+
+#### B. Tingkat 2: Analisis Mendalam via Google Gemini 2.5 Flash (*Optional User API Key*)
+- **Model Mutakhir**: Menggunakan model Google **`gemini-2.5-flash`** yang memiliki penalaran geospasial tinggi dan waktu respons yang cepat.
+- **Strict Geological Grounding Prompt**: Mengirimkan data empiris yang sedang tampak di layar (status 69 gunung api aktif, radius steril rekomendasi PVMBG, gempa bumi aktif USGS/BMKG, hasil deteksi kluster susulan, dan kedekatan spasial). Sistem menginstruksikan AI secara ketat untuk **hanya menganalisis data faktual** yang diberikan dan menyusun laporan terstruktur:
+  1. Ringkasan Situasi Geodinamika Terkini
+  2. Sorotan Gunung Berapi Kritis & Radius Steril
+  3. Dinamika Gempa Bumi, Sesar Aktif & Kluster Susulan
+  4. Anjuran Khusus Wisatawan, Pendaki & Komunitas Lokal
+  5. Rekomendasi Mitigasi & Kesiapsiagaan
+- **Privasi & Keamanan Kunci API**:
+  - Kunci API pengguna disimpan secara eksklusif di `localStorage` peramban pengguna.
+  - Kunci **tidak pernah dikirim** ke server backend aplikasi ini atau server pihak ketiga mana pun.
+  - Permintaan HTTP dikirim langsung dari peramban pengguna ke endpoint resmi Google: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`.
+  - Pengguna dapat memperbarui atau menghapus kunci API dari penyimpanan peramban sewaktu-waktu dengan satu klik pada modal pengaturan.
+
+---
+
+### 7. Logika Mode Layar Penuh & Reparenting Modal (*Fullscreen Top-Layer Logic*)
 - Peta dapat beralih ke mode layar penuh memanfaatkan *Browser Fullscreen API* (`element.requestFullscreen()`).
-- **Penanganan DOM Top-Layer**: Agar modal informasi "Tentang / Arti Level" tetap dapat dibuka saat peta dalam mode *fullscreen*, sistem secara dinamis memindahkan elemen modal ke dalam wadah layar penuh (`fsElement.appendChild(modal)`). Saat keluar dari fullscreen, modal otomatis dikembalikan ke `document.body`.
+- **Penanganan DOM Top-Layer**: Agar modal informasi "Tentang / Arti Level", modal Kunci API, dan modal Laporan Gemini tetap dapat dibuka saat peta dalam mode *fullscreen*, sistem secara dinamis memindahkan elemen modal ke dalam wadah layar penuh (`fsElement.appendChild(modal)`). Saat keluar dari fullscreen, modal otomatis dikembalikan ke `document.body`.
 - Sistem mendengarkan event native `fullscreenchange` dan tombol keyboard `ESC` untuk mereset ukuran peta (`map.invalidateSize()`) dan memperbarui ikon tombol.
 
-### 7. Keamanan & Sanitasi Data (*XSS Prevention*)
-- Seluruh konten teks dinamis dari API pihak ketiga (nama lokasi gempa, rekomendasi keselamatan PVMBG, deskripsi intensitas MMI) selalu melewati fungsi sanitasi `App.Utils.escapeHTML()` sebelum disisipkan ke dalam elemen DOM atau Leaflet Popup. Ini memastikan aplikasi kebal terhadap potensi celah keamanan *Cross-Site Scripting* (XSS).
+### 8. Keamanan & Sanitasi Data (*XSS Prevention*)
+- Seluruh konten teks dinamis dari API pihak ketiga (nama lokasi gempa, rekomendasi keselamatan PVMBG, deskripsi intensitas MMI, dan output markdown dari Gemini AI) selalu melewati fungsi sanitasi `App.Utils.escapeHTML()` atau parser markdown aman sebelum disisipkan ke dalam elemen DOM atau Leaflet Popup. Ini memastikan aplikasi kebal terhadap potensi celah keamanan *Cross-Site Scripting* (XSS).
 
 ---
 
