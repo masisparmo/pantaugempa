@@ -110,6 +110,86 @@ Pantau Gempa/
 
 ---
 
+## 🧠 Logika & Cara Kerja Aplikasi (System Logic & Workflow)
+
+Aplikasi dibangun dengan arsitektur **reaktif berbasis event (*event-driven reactive pattern*)** murni di sisi peramban (*client-side*) tanpa memerlukan server rendering ataupun *bundler*. Diagram alur berikut menggambarkan siklus kerja pemrosesan data dan interaksi antarmuka:
+
+```mermaid
+flowchart TD
+    A[Inisialisasi: DOMContentLoaded / App.init] --> B[Leaflet GIS & Chart Engine Ready]
+    A --> C[Fetch Data Gempa: USGS / BMKG]
+    A --> D[Fetch Data Gunung Api: PVMBG MAGMA]
+    
+    C --> E[Normalisasi & Sanitasi Data XSS]
+    D --> E
+    
+    E --> F[Penyimpanan Central State: App.State]
+    
+    F --> G[Render Peta: Marker Gempa & Radius Bahaya Gunung Api]
+    F --> H[Filter Spasial Bounding Box Viewport Peta]
+    
+    H --> I[Sinkronisasi Real-Time Tabel Gempa & Statistik Area]
+    H --> J[Update Grafik Distribusi Magnitudo]
+    
+    K[Interaksi Pengguna: Pan/Zoom Peta, Filter Status, Pencarian] --> H
+    K --> L[Filter Tabel Gunung Api: Waspada / Siaga / Awas]
+```
+
+### 1. Siklus Hidup & Inisialisasi (*Lifecycle & Bootstrap*)
+Saat halaman selesai dimuat (`DOMContentLoaded`), fungsi `App.init()` di [`js/app.js`](js/app.js) mengeksekusi urutan pemuatan paralel:
+1. **Peta GIS (`App.Map.init()`)**: Menginisialisasi Leaflet di elemen `#map` dengan koordinat pusat Indonesia `[-2.5, 118.0]` pada zoom level 5, menambahkan tile layer sesuai tema aktif (OSM / Esri), serta menyiapkan grup layer lempeng/sesar dan gunung api.
+2. **Grafik Statistik (`App.UI.initChart()`)**: Menginisialisasi Chart.js tipe *doughnut* untuk visualisasi kategori magnitudo gempa.
+3. **Pemuatan Data Gempa (`App.Logic.fetchEarthquakeData()`)**: Mengambil data gempa bumi awal sesuai provider aktif (default: USGS Global).
+4. **Pemuatan Data Gunung Api (`App.Data.fetchVolcanoData()`)**: Mengambil dataset 69 gunung api aktif Indonesia dari `data/gunung-api.json`.
+5. **Background Timers**:
+   - Menjalankan *live ticker* waktu relatif gempa terbaru setiap 60 detik.
+   - Menjalankan *auto-refresh background timer* data gempa setiap 3 menit.
+
+### 2. Penyerapan & Normalisasi Data Multi-Sumber (*Data Ingestion & Normalization*)
+- **Data Gempa BMKG**: Mengambil data `gempaterkini.json` (gempa M ≥ 5.0) dan `gempadirasakan.json` (gempa dirasakan) secara paralel dengan *cache-busting* (`?_t=timestamp`). Sistem melakukan normalisasi tanggal/jam lokal Indonesia (WIB/WITA/WIT) ke objek waktu standar Unix timestamp, mengonversi string koordinat lintang/bujur menjadi angka desimal float, dan melakukan deduplikasi data gempa yang muncul di kedua feed.
+- **Data Gempa USGS**: Mengirim HTTP GET request ke GeoJSON API USGS dengan parameter dinamis: `minmagnitude`, rentang waktu (`starttime`/`endtime`), dan batas koordinat wilayah (*bounding box* geo). Fitur GeoJSON dipetakan menjadi model data seragam: `{ id, mag, place, time, lat, lon, depth, mmi, cdi, source }`.
+- **Data Gunung Api PVMBG MAGMA**: Membaca dataset terstruktur yang memuat status 69 gunung api aktif, koordinat presisi, elevasi, radius bahaya sektoral, dan tautan laporan resmi PVMBG.
+
+### 3. Logika Sinkronisasi Spasial Peta & Tabel (*Spatial Bounds Sync*)
+- Setiap kali pengguna menggeser (*pan*) atau memperbesar/memperkecil (*zoom*) peta, event Leaflet `moveend` mendeteksi batas koordinat pandang layar (`map.getBounds()`).
+- Data gempa yang tersimpan di memori (`App.State.rawFetchedEarthquakes`) disaring secara cepat (*in-memory bounding box filtering*):
+  - Memilih data di mana lintang berada di antara batas selatan & utara layar, dan bujur berada di antara batas barat & timur layar.
+- Hasil penyaringan spasial ini langsung disinkronkan secara instan ke:
+  - **Statistik Cepat**: Jumlah gempa terlihat, magnitudo tertinggi di layar, kedalaman maksimal, dan waktu gempa paling mutakhir.
+  - **Tabel Gempa**: Di-render ulang secara instan tanpa membebani browser.
+  - **Grafik Distribusi**: Doughnut Chart.js diperbarui secara dinamis.
+
+### 4. Logika Pencarian Cerdas & Auto-Focus Geografis (*Smart Alias Zooming*)
+- Sistem dilengkapi kamus alias geografis kepulauan Indonesia (`App.Config.REGION_ALIASES`).
+- Saat pengguna mengetik nama pulau atau wilayah (seperti *"NTT"*, *"Lombok"*, *"Jogja"*, *"Bandung"*, *"Aceh"*, *"Ambon"*, *"Jayapura"*), sistem secara otomatis:
+  1. Mengenali wilayah target dan mengambil titik koordinat pusat serta level zoom optimal.
+  2. Mengarahkan peta secara halus (*smooth pan/zoom*) ke wilayah tersebut.
+  3. Memfilter data gempa pada tabel sesuai wilayah yang dicari.
+
+### 5. Logika Pemantauan Gunung Api & Filter Multi-Level (*Volcano Interactive Logic*)
+- **Marker Dinamis & Radius Bahaya**: Marker gunung api dibuat dengan ikon kustom dengan kode warna status:
+  - Merah (*Awas / Level IV*), Oranye (*Siaga / Level III*), Kuning (*Waspada / Level II*), Hijau (*Normal / Level I*).
+  - Untuk gunung berstatus Level 2–4, sistem menggambar lingkaran radius bahaya sektoral (`L.circle`) dengan jarak kilometer resmi dari PVMBG.
+- **Filter Status Mandiri pada Tabel**:
+  - Filter status tabel (`Semua`, `Awas`, `Siaga`, `Waspada`) memfilter data secara instan:
+    - **Awas**: Menampilkan khusus `level == 4`.
+    - **Siaga**: Menampilkan khusus `level == 3`.
+    - **Waspada**: Menampilkan khusus `level == 2`.
+    - **Semua**: Menampilkan gabungan level elevated `level >= 2`.
+  - Pencarian teks (nama gunung/provinsi) diterapkan secara reaktif di atas filter status yang aktif.
+  - Tombol **"Peta"** pada tabel memicu `App.Map.focusVolcano(id)` yang menggulirkan layar ke peta, memusatkan koordinat (`setView`), dan otomatis membuka popup status detail.
+  - Kartu statistik Level IV, III, dan II di panel kanan dapat diklik langsung (*interactive click*) untuk menyaring tabel secara cepat.
+
+### 6. Logika Mode Layar Penuh & Reparenting Modal (*Fullscreen Top-Layer Logic*)
+- Peta dapat beralih ke mode layar penuh memanfaatkan *Browser Fullscreen API* (`element.requestFullscreen()`).
+- **Penanganan DOM Top-Layer**: Agar modal informasi "Tentang / Arti Level" tetap dapat dibuka saat peta dalam mode *fullscreen*, sistem secara dinamis memindahkan elemen modal ke dalam wadah layar penuh (`fsElement.appendChild(modal)`). Saat keluar dari fullscreen, modal otomatis dikembalikan ke `document.body`.
+- Sistem mendengarkan event native `fullscreenchange` dan tombol keyboard `ESC` untuk mereset ukuran peta (`map.invalidateSize()`) dan memperbarui ikon tombol.
+
+### 7. Keamanan & Sanitasi Data (*XSS Prevention*)
+- Seluruh konten teks dinamis dari API pihak ketiga (nama lokasi gempa, rekomendasi keselamatan PVMBG, deskripsi intensitas MMI) selalu melewati fungsi sanitasi `App.Utils.escapeHTML()` sebelum disisipkan ke dalam elemen DOM atau Leaflet Popup. Ini memastikan aplikasi kebal terhadap potensi celah keamanan *Cross-Site Scripting* (XSS).
+
+---
+
 ## 🛠️ Teknologi yang Digunakan
 
 - **Markup & Layout**: HTML5 Semantik
