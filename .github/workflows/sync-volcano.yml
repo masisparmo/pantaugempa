@@ -1,0 +1,46 @@
+name: Sinkronisasi Data Gunung Api PVMBG
+
+on:
+  schedule:
+    # Berjalan otomatis setiap 24 jam sekali pada pukul 00:00 UTC (07:00 WIB)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Memungkinkan eksekusi manual lewat tombol "Run workflow" di GitHub Actions
+  push:
+    paths:
+      - 'scripts/sync_volcanoes.py'
+      - '.github/workflows/sync-volcano.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install beautifulsoup4
+
+      - name: Jalankan Sinkronisasi PVMBG MAGMA
+        run: |
+          python scripts/sync_volcanoes.py
+
+      - name: Commit dan Push Data Terbaru
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/gunung-api.json
+          if git diff --staged --quiet; then
+            echo "Tidak ada perubahan pada status aktivitas gunung api."
+          else
+            git commit -m "Auto-update: Status data gunung api PVMBG [skip ci]"
+            git push
+          fi

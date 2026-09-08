@@ -1,0 +1,554 @@
+{
+  "anak krakatau": {
+    "nama": "Anak Krakatau",
+    "provinsi": "Lampung",
+    "lat": -6.102,
+    "lon": 105.423,
+    "elevasi": 157,
+    "tipe": "Stratovulkan"
+  },
+  "lewotobi laki-laki": {
+    "nama": "Lewotobi Laki-laki",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.5389,
+    "lon": 122.7682,
+    "elevasi": 1584,
+    "tipe": "Stratovulkan"
+  },
+  "merapi": {
+    "nama": "Merapi",
+    "provinsi": "Daerah Istimewa Yogyakarta dan Jawa Tengah",
+    "lat": -7.542,
+    "lon": 110.442,
+    "elevasi": 2968,
+    "tipe": "Stratovulkan"
+  },
+  "semeru": {
+    "nama": "Semeru",
+    "provinsi": "Jawa Timur",
+    "lat": -8.108,
+    "lon": 112.92,
+    "elevasi": 3676,
+    "tipe": "Stratovulkan"
+  },
+  "sinabung": {
+    "nama": "Sinabung",
+    "provinsi": "Sumatera Utara",
+    "lat": 3.17,
+    "lon": 98.392,
+    "elevasi": 2460,
+    "tipe": "Stratovulkan"
+  },
+  "anak ranakah": {
+    "nama": "Anak Ranakah",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.62,
+    "lon": 120.52,
+    "elevasi": 2350,
+    "tipe": "Stratovulkan"
+  },
+  "awu": {
+    "nama": "Awu",
+    "provinsi": "Sulawesi Utara",
+    "lat": 3.682846,
+    "lon": 125.45598,
+    "elevasi": 1320,
+    "tipe": "Stratovulkan"
+  },
+  "banda api": {
+    "nama": "Banda Api",
+    "provinsi": "Maluku",
+    "lat": -4.523,
+    "lon": 129.881,
+    "elevasi": 641,
+    "tipe": "Stratovulkan"
+  },
+  "bromo": {
+    "nama": "Bromo",
+    "provinsi": "Jawa Timur",
+    "lat": -7.942,
+    "lon": 112.95,
+    "elevasi": 2329,
+    "tipe": "Stratovulkan"
+  },
+  "bur ni telong": {
+    "nama": "Bur Ni Telong",
+    "provinsi": "Aceh",
+    "lat": 4.769,
+    "lon": 96.821,
+    "elevasi": 2623,
+    "tipe": "Stratovulkan"
+  },
+  "dempo": {
+    "nama": "Dempo",
+    "provinsi": "Sumatera Selatan",
+    "lat": -4.03,
+    "lon": 103.13,
+    "elevasi": 3173,
+    "tipe": "Stratovulkan"
+  },
+  "dukono": {
+    "nama": "Dukono",
+    "provinsi": "Maluku Utara",
+    "lat": 1.693,
+    "lon": 127.894,
+    "elevasi": 1087,
+    "tipe": "Stratovulkan"
+  },
+  "gamalama": {
+    "nama": "Gamalama",
+    "provinsi": "Maluku Utara",
+    "lat": 0.8,
+    "lon": 127.33,
+    "elevasi": 1715,
+    "tipe": "Stratovulkan"
+  },
+  "ibu": {
+    "nama": "Ibu",
+    "provinsi": "Maluku Utara",
+    "lat": 1.488,
+    "lon": 127.63,
+    "elevasi": 1325,
+    "tipe": "Stratovulkan"
+  },
+  "ili lewotolok": {
+    "nama": "Ili Lewotolok",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.272,
+    "lon": 123.505,
+    "elevasi": 1423,
+    "tipe": "Stratovulkan"
+  },
+  "iya": {
+    "nama": "Iya",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.897,
+    "lon": 121.645,
+    "elevasi": 637,
+    "tipe": "Stratovulkan"
+  },
+  "karangetang": {
+    "nama": "Karangetang",
+    "provinsi": "Sulawesi Utara",
+    "lat": 2.78,
+    "lon": 125.406,
+    "elevasi": 1784,
+    "tipe": "Stratovulkan"
+  },
+  "kerinci": {
+    "nama": "Kerinci",
+    "provinsi": "Jambi, Sumatera Barat",
+    "lat": -1.697,
+    "lon": 101.264,
+    "elevasi": 3805,
+    "tipe": "Stratovulkan"
+  },
+  "lokon": {
+    "nama": "Lokon",
+    "provinsi": "Sulawesi Utara",
+    "lat": 1.358,
+    "lon": 124.792,
+    "elevasi": 1580,
+    "tipe": "Stratovulkan"
+  },
+  "marapi": {
+    "nama": "Marapi",
+    "provinsi": "Sumatera Barat",
+    "lat": -0.381,
+    "lon": 100.473,
+    "elevasi": 2891,
+    "tipe": "Stratovulkan"
+  },
+  "raung": {
+    "nama": "Raung",
+    "provinsi": "Jawa Timur",
+    "lat": -8.125,
+    "lon": 114.042,
+    "elevasi": 3332,
+    "tipe": "Stratovulkan"
+  },
+  "rinjani": {
+    "nama": "Rinjani",
+    "provinsi": "Nusa Tenggara Barat",
+    "lat": -8.42,
+    "lon": 116.47,
+    "elevasi": 3726,
+    "tipe": "Stratovulkan"
+  },
+  "sangeangapi": {
+    "nama": "Sangeangapi",
+    "provinsi": "Nusa Tenggara Barat",
+    "lat": -8.2,
+    "lon": 119.07,
+    "elevasi": 1949,
+    "tipe": "Stratovulkan"
+  },
+  "slamet": {
+    "nama": "Slamet",
+    "provinsi": "Jawa Tengah",
+    "lat": -7.242,
+    "lon": 109.208,
+    "elevasi": 3428,
+    "tipe": "Stratovulkan"
+  },
+  "soputan": {
+    "nama": "Soputan",
+    "provinsi": "Sulawesi Utara",
+    "lat": 1.1145,
+    "lon": 124.737,
+    "elevasi": 1809,
+    "tipe": "Stratovulkan"
+  },
+  "sorikmarapi": {
+    "nama": "Sorikmarapi",
+    "provinsi": "Sumatera Utara",
+    "lat": 0.686,
+    "lon": 99.537,
+    "elevasi": 2145,
+    "tipe": "Stratovulkan"
+  },
+  "tambora": {
+    "nama": "Tambora",
+    "provinsi": "Nusa Tenggara Barat",
+    "lat": -8.25,
+    "lon": 118.0,
+    "elevasi": 2850,
+    "tipe": "Stratovulkan"
+  },
+  "agung": {
+    "nama": "Agung",
+    "provinsi": "Bali",
+    "lat": -8.342,
+    "lon": 115.508,
+    "elevasi": 3142,
+    "tipe": "Stratovulkan"
+  },
+  "ambang": {
+    "nama": "Ambang",
+    "provinsi": "Sulawesi Utara",
+    "lat": 0.75,
+    "lon": 124.42,
+    "elevasi": 1795,
+    "tipe": "Stratovulkan"
+  },
+  "arjuno welirang": {
+    "nama": "Arjuno Welirang",
+    "provinsi": "Jawa Timur",
+    "lat": -7.725,
+    "lon": 112.58,
+    "elevasi": 3339,
+    "tipe": "Stratovulkan"
+  },
+  "batur": {
+    "nama": "Batur",
+    "provinsi": "Bali",
+    "lat": -8.242,
+    "lon": 115.375,
+    "elevasi": 1717,
+    "tipe": "Stratovulkan"
+  },
+  "batutara": {
+    "nama": "Batutara",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -7.792,
+    "lon": 123.579,
+    "elevasi": 748,
+    "tipe": "Stratovulkan"
+  },
+  "ciremai": {
+    "nama": "Ciremai",
+    "provinsi": "Jawa Barat",
+    "lat": -6.892,
+    "lon": 108.4,
+    "elevasi": 3078,
+    "tipe": "Stratovulkan"
+  },
+  "colo": {
+    "nama": "Colo",
+    "provinsi": "Sulawesi Tengah",
+    "lat": -0.162,
+    "lon": 121.601,
+    "elevasi": 404,
+    "tipe": "Stratovulkan"
+  },
+  "dieng": {
+    "nama": "Dieng",
+    "provinsi": "Jawa Tengah",
+    "lat": -7.2,
+    "lon": 109.92,
+    "elevasi": 2565,
+    "tipe": "Stratovulkan"
+  },
+  "ebulobo": {
+    "nama": "Ebulobo",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.82,
+    "lon": 121.18,
+    "elevasi": 2124,
+    "tipe": "Stratovulkan"
+  },
+  "egon": {
+    "nama": "Egon",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.676,
+    "lon": 122.455,
+    "elevasi": 1661,
+    "tipe": "Stratovulkan"
+  },
+  "galunggung": {
+    "nama": "Galunggung",
+    "provinsi": "Jawa Barat",
+    "lat": -7.25,
+    "lon": 108.058,
+    "elevasi": 2168,
+    "tipe": "Stratovulkan"
+  },
+  "gamkonora": {
+    "nama": "Gamkonora",
+    "provinsi": "Maluku Utara",
+    "lat": 1.38,
+    "lon": 127.53,
+    "elevasi": 1635,
+    "tipe": "Stratovulkan"
+  },
+  "gede": {
+    "nama": "Gede",
+    "provinsi": "Jawa Barat",
+    "lat": -6.77,
+    "lon": 106.965,
+    "elevasi": 2958,
+    "tipe": "Stratovulkan"
+  },
+  "guntur": {
+    "nama": "Guntur",
+    "provinsi": "Jawa Barat",
+    "lat": -7.143,
+    "lon": 107.84,
+    "elevasi": 2249,
+    "tipe": "Stratovulkan"
+  },
+  "hobal": {
+    "nama": "Hobal",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.5444,
+    "lon": 123.585,
+    "elevasi": null,
+    "tipe": "Stratovulkan"
+  },
+  "ijen": {
+    "nama": "Ijen",
+    "provinsi": "Jawa Timur",
+    "lat": -8.058,
+    "lon": 114.242,
+    "elevasi": 2386,
+    "tipe": "Stratovulkan"
+  },
+  "ile werung": {
+    "nama": "Ile Werung",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.53,
+    "lon": 123.57,
+    "elevasi": 1018,
+    "tipe": "Stratovulkan"
+  },
+  "ili boleng": {
+    "nama": "Ili Boleng",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.342,
+    "lon": 123.258,
+    "elevasi": 1659,
+    "tipe": "Stratovulkan"
+  },
+  "inielika": {
+    "nama": "Inielika",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.73,
+    "lon": 120.98,
+    "elevasi": 1559,
+    "tipe": "Stratovulkan"
+  },
+  "inierie": {
+    "nama": "Inierie",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.875,
+    "lon": 120.95,
+    "elevasi": 2245,
+    "tipe": "Stratovulkan"
+  },
+  "kaba": {
+    "nama": "Kaba",
+    "provinsi": "Bengkulu",
+    "lat": -3.52,
+    "lon": 102.62,
+    "elevasi": 1952,
+    "tipe": "Stratovulkan"
+  },
+  "kelimutu": {
+    "nama": "Kelimutu",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.77,
+    "lon": 121.82,
+    "elevasi": 1639,
+    "tipe": "Stratovulkan"
+  },
+  "kelud": {
+    "nama": "Kelud",
+    "provinsi": "Jawa Timur",
+    "lat": -7.93,
+    "lon": 112.308,
+    "elevasi": 1731,
+    "tipe": "Stratovulkan"
+  },
+  "kie besi": {
+    "nama": "Kie Besi",
+    "provinsi": "Maluku Utara",
+    "lat": 0.32,
+    "lon": 127.4,
+    "elevasi": 1357,
+    "tipe": "Stratovulkan"
+  },
+  "lamongan": {
+    "nama": "Lamongan",
+    "provinsi": "Jawa Timur",
+    "lat": -7.979,
+    "lon": 113.342,
+    "elevasi": 1651,
+    "tipe": "Stratovulkan"
+  },
+  "lereboleng": {
+    "nama": "Lereboleng",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.365,
+    "lon": 122.833,
+    "elevasi": 1095,
+    "tipe": "Stratovulkan"
+  },
+  "lewotobi perempuan": {
+    "nama": "Lewotobi Perempuan",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.5539,
+    "lon": 122.7805,
+    "elevasi": 1703,
+    "tipe": "Stratovulkan"
+  },
+  "mahawu": {
+    "nama": "Mahawu",
+    "provinsi": "Sulawesi Utara",
+    "lat": 1.352,
+    "lon": 124.865,
+    "elevasi": 1299,
+    "tipe": "Stratovulkan"
+  },
+  "papandayan": {
+    "nama": "Papandayan",
+    "provinsi": "Jawa Barat",
+    "lat": -7.32,
+    "lon": 107.73,
+    "elevasi": 2665,
+    "tipe": "Stratovulkan"
+  },
+  "peut sague": {
+    "nama": "Peut Sague",
+    "provinsi": "Daerah Istimewa Aceh",
+    "lat": 4.914,
+    "lon": 96.329,
+    "elevasi": 2801,
+    "tipe": "Stratovulkan"
+  },
+  "rokatenda": {
+    "nama": "Rokatenda",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.32,
+    "lon": 121.708,
+    "elevasi": 875,
+    "tipe": "Stratovulkan"
+  },
+  "ruang": {
+    "nama": "Ruang",
+    "provinsi": "Sulawesi Utara",
+    "lat": 2.3031,
+    "lon": 125.3667,
+    "elevasi": 725,
+    "tipe": "Stratovulkan"
+  },
+  "salak": {
+    "nama": "Salak",
+    "provinsi": "Jawa Barat",
+    "lat": -6.72,
+    "lon": 106.73,
+    "elevasi": 2211,
+    "tipe": "Stratovulkan"
+  },
+  "seulawah agam": {
+    "nama": "Seulawah Agam",
+    "provinsi": "Daerah Istimewa Aceh",
+    "lat": 5.448,
+    "lon": 95.658,
+    "elevasi": 1810,
+    "tipe": "Stratovulkan"
+  },
+  "sirung": {
+    "nama": "Sirung",
+    "provinsi": "Nusa Tenggara Timur",
+    "lat": -8.508,
+    "lon": 124.13,
+    "elevasi": 862,
+    "tipe": "Stratovulkan"
+  },
+  "sumbing": {
+    "nama": "Sumbing",
+    "provinsi": "Jawa Tengah",
+    "lat": -7.384,
+    "lon": 110.07,
+    "elevasi": 3371,
+    "tipe": "Stratovulkan"
+  },
+  "sundoro": {
+    "nama": "Sundoro",
+    "provinsi": "Jawa Tengah",
+    "lat": -7.3,
+    "lon": 109.992,
+    "elevasi": 3160,
+    "tipe": "Stratovulkan"
+  },
+  "talang": {
+    "nama": "Talang",
+    "provinsi": "Sumatera Barat",
+    "lat": -0.978,
+    "lon": 100.679,
+    "elevasi": 2597,
+    "tipe": "Stratovulkan"
+  },
+  "tandikat": {
+    "nama": "Tandikat",
+    "provinsi": "Sumatera Barat",
+    "lat": -0.39,
+    "lon": 100.331,
+    "elevasi": 2438,
+    "tipe": "Stratovulkan"
+  },
+  "tangkoko": {
+    "nama": "Tangkoko",
+    "provinsi": "Sulawesi Utara",
+    "lat": 1.518,
+    "lon": 125.185,
+    "elevasi": 1334,
+    "tipe": "Stratovulkan"
+  },
+  "tangkuban parahu": {
+    "nama": "Tangkuban Parahu",
+    "provinsi": "Jawa Barat",
+    "lat": -6.77,
+    "lon": 107.6,
+    "elevasi": 2084,
+    "tipe": "Stratovulkan"
+  },
+  "wurlali": {
+    "nama": "Wurlali",
+    "provinsi": "Maluku",
+    "lat": -7.125,
+    "lon": 128.675,
+    "elevasi": 868,
+    "tipe": "Stratovulkan"
+  }
+}
