@@ -69,15 +69,16 @@ Aplikasi ini dapat diakses langsung secara online melalui: **[https://pantaugemp
 
 ---
 
-### 🤖 5. AI Situational Analysis & Travel Advisory (Sistem Pakar Hibrida + Gemini 2.5 Flash)
+### 🤖 5. Sistem Pakar & Analisa by AI (Travel & Situational Advisory)
 - **Panel Peringatan & Rekomendasi Keselamatan Perjalanan**: Ditempatkan tepat di bawah peta interaktif untuk memberikan arahan langsung kepada masyarakat, pelancong (*travelers*), dan pegiat alam terbuka (*hikers*).
 - **Sistem Pakar Spasial Instan (Tanpa Kunci API - 100% Gratis)**:
   - Berjalan langsung di peramban pengguna (*client-side*) secara instan tanpa biaya dan tanpa perlu API key.
   - Memanfaatkan kalkulasi jarak geodesik Haversine, deteksi kluster gempa susulan (*aftershock swarms*), tumpang-tindih multi-bahaya (*multi-hazard overlap*), dan scoring level ancaman (*Normal, Waspada, Siaga, Awas*).
-- **Analisis Mendalam Opsional dengan Google Gemini 2.5 Flash**:
-  - Pengguna dapat memasukkan Google Gemini API Key milik sendiri untuk menghasilkan narasi mendalam seputar dinamika tektono-vulkanik, analisis sesar, dan rencana keselamatan rute.
-  - Menggunakan model mutakhir **`gemini-2.5-flash`**.
-  - **Privasi & Keamanan Terjamin**: API Key disimpan secara eksklusif di `localStorage` perangkat pengguna dan dikirim langsung ke endpoint resmi Google AI tanpa perantara server pihak ketiga.
+  - **Penyebutan Wilayah & Daerah Secara Eksplisit**: Menyebutkan nama gunung beserta provinsi/daerahnya (misal: *Sinabung (Sumatera Utara), Semeru (Jawa Timur), Merapi (D.I. Yogyakarta/Jateng)*) serta lokasi gempa susulan agar arahan keselamatan tepat sasaran.
+- **Analisa by AI (Analisis Narasi Mendalam)**:
+  - Pengguna dapat memasukkan Kunci API Google Gemini milik sendiri untuk menghasilkan narasi mendalam seputar dinamika tektono-vulkanik, zona steril wisata, kesiapsiagaan warga, dan jalur transportasi.
+  - Menggunakan model mutakhir **`gemini-2.5-flash`** dengan konfigurasi output penuh tanpa terpotong.
+  - **Privasi & Keamanan Terjamin**: Kunci API disimpan secara eksklusif di `localStorage` perangkat pengguna dan dikirim langsung ke endpoint resmi Google AI tanpa perantara server pihak ketiga.
 
 ---
 
@@ -193,9 +194,9 @@ Saat halaman selesai dimuat (`DOMContentLoaded`), fungsi `App.init()` di [`js/ap
   - Tombol **"Peta"** pada tabel memicu `App.Map.focusVolcano(id)` yang menggulirkan layar ke peta, memusatkan koordinat (`setView`), dan otomatis membuka popup status detail.
   - Kartu statistik Level IV, III, dan II di panel kanan dapat diklik langsung (*interactive click*) untuk menyaring tabel secara cepat.
 
-### 6. Logika Sistem Pakar AI & Anjuran Keselamatan (AI Situational Analysis & Travel Advisory Logic)
+### 6. Logika Sistem Pakar & Analisa by AI (Travel & Situational Advisory)
 
-Fitur analisis keselamatan memadukan pendekatan **Arsitektur Hibrida Dua Tingkat (*Two-Tier Hybrid Architecture*)**:
+Fitur analisis keselamatan memadukan dua pendekatan terintegrasi:
 
 ```mermaid
 flowchart TD
@@ -207,18 +208,19 @@ flowchart TD
     D --> F[Evaluasi Skor Ancaman: Normal, Waspada, Siaga, Awas]
     E --> F
     
-    F --> G[Render Panel AI Instan: Ringkasan & Anjuran Perjalanan]
+    F --> G[Render Panel Sistem Pakar: Ringkasan Wilayah & Anjuran Perjalanan]
     
     G --> H{Pengguna Meminta Analisis Mendalam?}
     H -- Tidak / Tanpa API Key --> I[Sistem Pakar Instan Tetap Berjalan 100% Gratis]
-    H -- Ya / Klik 'Analisis Gemini 2.5' --> J{Kunci API Ada di LocalStorage?}
-    J -- Belum Ada --> K[Tampilkan Modal Input Kunci API Gemini]
+    H -- Ya / Klik 'Analisa by AI' --> J{Kunci API Ada di LocalStorage?}
+    J -- Belum Ada --> K[Tampilkan Modal Input Kunci API]
     J -- Ada --> L[Kirim Konteks Grounding Empiris ke Gemini 2.5 Flash]
-    L --> M[Render Laporan Geologis & Travel Advisory Komprehensif di Modal]
+    L --> M[Render Laporan Lengkap Analisa by AI di Modal]
 ```
 
-#### A. Tingkat 1: Sistem Pakar Spasial Klien (*Client-Side Geospatial Expert System - Zero API Key*)
+#### A. Sistem Pakar Spasial Klien (*Client-Side Geospatial Expert System - Zero API Key*)
 - **100% Berjalan Lokal & Instan**: Tidak membebani kuota API dan dapat bekerja tanpa ketergantungan koneksi ke layanan AI eksternal.
+- **Penyebutan Daerah & Provinsi**: Secara eksplisit mencantumkan nama daerah dan provinsi untuk setiap gunung berapi (misal: *Sinabung (Sumatera Utara), Semeru (Jawa Timur), Merapi (D.I. Yogyakarta/Jateng), Lewotobi Laki-laki (NTT)*) serta lokasi gempa susulan.
 - **Kalkulasi Geodesik Haversine**: Menghitung jarak melengkung di permukaan bumi antarkoordinat lintang/bujur secara matematis presisi:
   $$d = 2R \arcsin\left(\sqrt{\sin^2\left(\frac{\Delta \phi}{2}\right) + \cos(\phi_1)\cos(\phi_2)\sin^2\left(\frac{\Delta \lambda}{2}\right)}\right)$$
   dengan radius rata-rata bumi $R = 6371\text{ km}$.
@@ -229,16 +231,15 @@ flowchart TD
   - 🟠 **SIAGA**: Terdeteksi gunung api Level III (Siaga), kluster gempa susulan aktif, gempa dangkal di dekat tubuh gunung api aktif, atau gempa bumi $M \ge 5.0$.
   - 🟡 **WASPADA**: Terdeteksi gunung api Level II (Waspada) atau gempa bumi $M \ge 4.0$.
   - 🟢 **NORMAL**: Kondisi seismovulkanik di area pandang dalam batas fluktuasi normal.
-- **Formulasi Anjuran Perjalanan Praktis (*Actionable Travel Advisory*)**: Menghasilkan poin-poin anjuran keselamatan untuk pelancong dan pendaki gunung (larangan melintasi radius bahaya sektoral, penangguhan aktivitas pendakian, kewaspadaan terhadap bahaya sekunder seperti lahar hujan dan gas beracun, serta kesiapsiagaan jalur evakuasi).
+- **Formulasi Anjuran Perjalanan Praktis (*Actionable Travel Advisory*)**: Menghasilkan poin-poin anjuran keselamatan untuk pelancong dan pendaki gunung lengkap dengan nama daerahnya.
 
-#### B. Tingkat 2: Analisis Mendalam via Google Gemini 2.5 Flash (*Optional User API Key*)
-- **Model Mutakhir**: Menggunakan model Google **`gemini-2.5-flash`** yang memiliki penalaran geospasial tinggi dan waktu respons yang cepat.
-- **Strict Geological Grounding Prompt**: Mengirimkan data empiris yang sedang tampak di layar (status 69 gunung api aktif, radius steril rekomendasi PVMBG, gempa bumi aktif USGS/BMKG, hasil deteksi kluster susulan, dan kedekatan spasial). Sistem menginstruksikan AI secara ketat untuk **hanya menganalisis data faktual** yang diberikan dan menyusun laporan terstruktur:
-  1. Ringkasan Situasi Geodinamika Terkini
-  2. Sorotan Gunung Berapi Kritis & Radius Steril
-  3. Dinamika Gempa Bumi, Sesar Aktif & Kluster Susulan
-  4. Anjuran Khusus Wisatawan, Pendaki & Komunitas Lokal
-  5. Rekomendasi Mitigasi & Kesiapsiagaan
+#### B. Analisa by AI (*Optional In-Depth Narrative Report*)
+- **Model Mutakhir**: Menggunakan model Google **`gemini-2.5-flash`** dengan konfigurasi output penuh (token 8192) tanpa terpotong.
+- **Strict Geological Grounding Prompt**: Mengirimkan data empiris yang sedang tampak di layar (status 69 gunung api aktif, provinsi/wilayah, radius steril rekomendasi PVMBG, gempa bumi aktif USGS/BMKG, hasil deteksi kluster susulan, dan kedekatan spasial). Sistem menginstruksikan AI secara ketat untuk **hanya menganalisis data faktual** yang diberikan dan menyusun laporan terstruktur:
+  1. Kajian Ancaman Vulkanik & Kegempaan Wilayah
+  2. Zona Bahaya & Anjuran Perjalanan Wisata
+  3. Instruksi Kesiapsiagaan Bagi Masyarakat Sekitar
+  4. Rekomendasi Jalur Transportasi & Logistik
 - **Privasi & Keamanan Kunci API**:
   - Kunci API pengguna disimpan secara eksklusif di `localStorage` peramban pengguna.
   - Kunci **tidak pernah dikirim** ke server backend aplikasi ini atau server pihak ketiga mana pun.
