@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-09-08 08:24:09 WIB",
-  "last_updated_iso": "2026-09-08T08:24:09.672074",
+  "last_updated": "2026-09-08 02:26:33 WIB",
+  "last_updated_iso": "2026-09-08T02:26:33.234387",
   "source": "Pusat Vulkanologi dan Mitigasi Bencana Geologi (PVMBG) - Badan Geologi Kementerian ESDM",
   "official_source_url": "https://magma.esdm.go.id/v1/gunung-api/tingkat-aktivitas",
   "statistics": {
@@ -153,13 +153,13 @@
       "level": 2,
       "status": "Waspada",
       "level_text": "Level II (Waspada)",
-      "report_url": "https://magma.esdm.go.id/v1/gunung-api/laporan/325229?signature=786ebd0a4cf1d6ea0ebfd350269ed1bbca0ca480bd2ee49e5048a0ee8987d282",
+      "report_url": "https://magma.esdm.go.id/v1/gunung-api/laporan/325327?signature=90c84f2aff69be02b8195d8b562b7603bdfc56d6b02c3bbee50fb94ffcff6d48",
       "lat": -8.2,
       "lon": 119.07,
       "elevasi": 1949,
-      "periode": "Sangeangapi, Minggu - 06 September 2026, periode 00:00-24:00 WITA",
-      "rekomendasi": "Masyarakat/pengunjung/wisatawan untuk tidak melakukan aktivitas dalam radius 3 KM dari pusat aktivitas (kawah utama) dan sektoral Timur - Tenggara sampai garis pantai 6.5 KM",
-      "radius_bahaya_km": 3.0
+      "periode": "Sangeangapi, Senin - 07 September 2026, periode 00:00-24:00 WITA",
+      "rekomendasi": "(1)Masyarakat di sekitar G. Sangeangapi dan pengunjung/wisatawan agar tidak beraktivitas di dalam radius 1.5 km dari kawah G. Sangeangapi. (2) Masyarakat di sekitar G. Sangeangapi dan pengunjung/wisatawan agar mewaspadai bahaya aliran piroklastik serta tidak diperbolehkan mendekati dan beraktivitas di daerah di antara Lembah Sori Wala dan Sori Mantau hingga mencapai pantai, serta pada Lembah Sori Boro dan Sori Oi. (3) Masyarakat, petani, pengunjung/wisatawan tidak diperbolehkan mendekati dan ber...",
+      "radius_bahaya_km": 1.5
     },
     {
       "id": "rinjani",
@@ -993,7 +993,7 @@
       "level": 1,
       "status": "Normal",
       "level_text": "Level I (Normal)",
-      "report_url": "https://magma.esdm.go.id/v1/gunung-api/laporan/325236?signature=f75156f4c29a712d7ba2d7de99b0d39694a8ed1da12f368602dbca45cb688d7c",
+      "report_url": "https://magma.esdm.go.id/v1/gunung-api/laporan/325326?signature=38c8ed1e402afbdefde93fe102483ea6a632dad56b5d756d8caa552ca3e2f345",
       "lat": -8.242,
       "lon": 115.375,
       "elevasi": 1717,
